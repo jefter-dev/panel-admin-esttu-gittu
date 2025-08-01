@@ -39,3 +39,18 @@ export function getFirebaseAdmin(app: "esttu" | "gittu"): FirebaseFirestore.Fire
     return {} as FirebaseFirestore.Firestore; // fallback
   }
 }
+
+// Função para baixar imagem do Storage
+export async function downloadImageFromFirebase(
+  app: "esttu" | "gittu",
+  filePath: string // caminho do arquivo no bucket, ex: "images/photo.jpg"
+): Promise<Buffer> {
+  const firebaseApp = admin.app(app);
+  const bucket = firebaseApp.storage().bucket();
+
+  // Faz download para buffer
+  const file = bucket.file(filePath);
+  const [buffer] = await file.download();
+
+  return buffer;
+}
