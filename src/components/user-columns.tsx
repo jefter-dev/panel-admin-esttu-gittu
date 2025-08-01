@@ -62,7 +62,7 @@ export const columns: ColumnDef<User>[] = [
               className="object-cover"
             />
           </div>
-          <Button size="sm" variant="outline" onClick={handleDownload}>
+          <Button className="cursor-pointer" size="sm" variant="outline" onClick={handleDownload}>
             Baixar
           </Button>
         </div>
@@ -80,12 +80,11 @@ export const columns: ColumnDef<User>[] = [
         id: user.id,
         nome: user.nome,
         sobrenome: user.sobrenome,
-        dataNascimento: user.dataNascimento,
         cpf: user.cpf,
-        instituicao: user.instituicao,
+        dataNascimento: user.dataNascimento,
         curso: user.curso,
+        instituicao: user.instituicao,
         anoParaRenovacao: user.anoParaRenovacao,
-        fotoIdentificacao: user.fotoIdentificacao,
       }));
 
       const qrCodeUrl = `${baseUrl}?user=${userEncoded}`;
@@ -94,7 +93,7 @@ export const columns: ColumnDef<User>[] = [
       return (
         <Dialog>
           <DialogTrigger asChild>
-            <Button variant="outline" size="sm">
+            <Button className="cursor-pointer" variant="outline" size="sm">
               Visualizar QR Code
             </Button>
           </DialogTrigger>
@@ -108,10 +107,6 @@ export const columns: ColumnDef<User>[] = [
                 fgColor="#000000"
                 quietZone={6}
                 id={canvasId}
-                logoImage="/logo.png"
-                logoWidth={230}
-                logoHeight={230}
-                logoOpacity={1}
                 ecLevel="H"
                 qrStyle="dots"
               />
@@ -119,6 +114,7 @@ export const columns: ColumnDef<User>[] = [
 
             <DialogFooter>
               <Button
+                className="cursor-pointer"
                 variant="default"
                 onClick={() => {
                   const canvas = document.getElementById(canvasId) as HTMLCanvasElement;
@@ -169,6 +165,18 @@ export const columns: ColumnDef<User>[] = [
   {
     accessorKey: "celular",
     header: "Celular",
+  },
+  {
+    accessorKey: "curso",
+    header: "Curso",
+  },
+  {
+    accessorKey: "instituicao",
+    header: "Instituicao",
+  },
+  {
+    accessorKey: "anoParaRenovacao",
+    header: "Ano Renovação",
   },
   {
     id: "enderecoCompleto",
