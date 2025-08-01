@@ -135,6 +135,10 @@ export const columns: ColumnDef<User>[] = [
     },
   },
   {
+    accessorKey: "id",
+    header: "id",
+  },
+  {
     id: "nome",
     header: "Nome",
     cell: ({ row }) => {
