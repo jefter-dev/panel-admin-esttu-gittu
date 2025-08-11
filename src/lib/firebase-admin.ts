@@ -1,56 +1,68 @@
+import { ConfigurationError } from "@/errors/custom.errors";
+import { APP } from "@/types/app";
 import admin from "firebase-admin";
 
-const initializedApps = new Map<string, FirebaseFirestore.Firestore>();
+export const APP_DATABASE_ADMIN = "admin";
+export const DATABASE_COLLECTION_ADMINS = "admins";
 
-export function getFirebaseAdmin(app: "esttu" | "gittu"): FirebaseFirestore.Firestore {
-  if (initializedApps.has(app)) {
-    return initializedApps.get(app)!;
-  }
+function getCredentialsForApp(app: APP) {
+  const getEnvVar = (key: string): string => {
+    const value = process.env[key];
+    // 2. Lance o erro específico em vez de um Error genérico
+    if (!value)
+      throw new ConfigurationError(
+        `Variável de ambiente obrigatória ausente: ${key}`
+      );
+    return value.replace(/\\n/g, "\n");
+  };
 
+  const appUpper = app.toUpperCase();
+
+  return {
+    projectId: getEnvVar(`FIREBASE_PROJECT_ID_${appUpper}`),
+    privateKey: getEnvVar(`FIREBASE_PRIVATE_KEY_${appUpper}`),
+    clientEmail: getEnvVar(`FIREBASE_CLIENT_EMAIL_${appUpper}`),
+  };
+}
+
+export function getFirebaseAdmin(app: APP): admin.firestore.Firestore {
   try {
-    if (!admin.apps.length) {
-      const getEnvVar = (key: string): string => {
-        const value = process.env[key];
-        if (!value) throw new Error(`Missing env var: ${key}`);
-        return value.replace(/\\n/g, "\n");
-      };
-
-      const upper = app.toUpperCase(); // ESTTU ou GITTU
-
-      const credential = {
-        projectId: getEnvVar(`FIREBASE_PROJECT_ID_${upper}`),
-        privateKey: getEnvVar(`FIREBASE_PRIVATE_KEY_${upper}`),
-        clientEmail: getEnvVar(`FIREBASE_CLIENT_EMAIL_${upper}`),
-      };
-
+    return admin.app(app).firestore();
+  } catch (error: unknown) {
+    if (
+      typeof error === "object" &&
+      error !== null &&
+      "code" in error &&
+      (error as { code?: string }).code === "app/no-app"
+    ) {
+      const credential = getCredentialsForApp(app);
       admin.initializeApp(
         {
           credential: admin.credential.cert(credential),
         },
-        app // Nome único para cada app
+        app
       );
+      return admin.app(app).firestore();
     }
-
-    const db = admin.app(app).firestore();
-    initializedApps.set(app, db);
-    return db;
-  } catch (err) {
-    console.error(`⚠️ Firebase Admin not initialized for ${app}:`, err);
-    return {} as FirebaseFirestore.Firestore; // fallback
+    throw error;
   }
 }
 
-// Função para baixar imagem do Storage
 export async function downloadImageFromFirebase(
-  app: "esttu" | "gittu",
-  filePath: string // caminho do arquivo no bucket, ex: "images/photo.jpg"
+  app: APP,
+  filePath: string
 ): Promise<Buffer> {
-  const firebaseApp = admin.app(app);
-  const bucket = firebaseApp.storage().bucket();
-
-  // Faz download para buffer
-  const file = bucket.file(filePath);
-  const [buffer] = await file.download();
-
-  return buffer;
+  try {
+    const firebaseApp = admin.app(app);
+    const bucket = firebaseApp.storage().bucket();
+    const file = bucket.file(filePath);
+    const [buffer] = await file.download();
+    return buffer;
+  } catch (error) {
+    console.error(
+      `Falha ao baixar imagem do Firebase Storage para o app ${app}:`,
+      error
+    );
+    throw new Error("Não foi possível processar a imagem.");
+  }
 }

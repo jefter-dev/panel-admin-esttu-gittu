@@ -1,7 +1,7 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { User } from "@/types/user-esttu";
+import { User } from "@/types/user";
 import { ArrowUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -12,7 +12,7 @@ import {
   Dialog,
   DialogTrigger,
   DialogContent,
-  DialogFooter
+  DialogFooter,
 } from "@/components/ui/dialog";
 import { QRCode } from "react-qrcode-logo";
 
@@ -62,7 +62,12 @@ export const columns: ColumnDef<User>[] = [
               className="object-cover"
             />
           </div>
-          <Button className="cursor-pointer" size="sm" variant="outline" onClick={handleDownload}>
+          <Button
+            className="cursor-pointer"
+            size="sm"
+            variant="outline"
+            onClick={handleDownload}
+          >
             Baixar
           </Button>
         </div>
@@ -76,16 +81,18 @@ export const columns: ColumnDef<User>[] = [
       const user = row.original;
 
       const baseUrl = "https://esttu-ec034.web.app/#/carteirinha";
-      const userEncoded = encodeURIComponent(JSON.stringify({
-        id: user.id,
-        nome: user.nome,
-        sobrenome: user.sobrenome,
-        cpf: user.cpf,
-        dataNascimento: user.dataNascimento,
-        curso: user.curso,
-        instituicao: user.instituicao,
-        anoParaRenovacao: user.anoParaRenovacao,
-      }));
+      const userEncoded = encodeURIComponent(
+        JSON.stringify({
+          id: user.id,
+          nome: user.nome,
+          sobrenome: user.sobrenome,
+          cpf: user.cpf,
+          dataNascimento: user.dataNascimento,
+          curso: user.curso,
+          instituicao: user.instituicao,
+          anoParaRenovacao: user.anoParaRenovacao,
+        })
+      );
 
       const qrCodeUrl = `${baseUrl}?user=${userEncoded}`;
       const canvasId = `qrcode-${user.id}`;
@@ -117,7 +124,9 @@ export const columns: ColumnDef<User>[] = [
                 className="cursor-pointer"
                 variant="default"
                 onClick={() => {
-                  const canvas = document.getElementById(canvasId) as HTMLCanvasElement;
+                  const canvas = document.getElementById(
+                    canvasId
+                  ) as HTMLCanvasElement;
                   if (!canvas) return;
 
                   const link = document.createElement("a");
@@ -193,7 +202,10 @@ export const columns: ColumnDef<User>[] = [
 
       return (
         <div className="text-sm leading-tight text-muted-foreground">
-          <div>{linha1}{linha2}</div>
+          <div>
+            {linha1}
+            {linha2}
+          </div>
           <div>{linha3}</div>
         </div>
       );
@@ -202,7 +214,10 @@ export const columns: ColumnDef<User>[] = [
   {
     accessorKey: "pagamentoEfetuado",
     header: ({ column }) => (
-      <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+      <Button
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+      >
         Pagamento
         <ArrowUpDown className="ml-2 h-4 w-4" />
       </Button>
@@ -218,7 +233,11 @@ export const columns: ColumnDef<User>[] = [
           </Badge>
           <div className="text-xs text-muted-foreground">
             {rawData
-              ? format(new Date(rawData as string), "dd/MM/yyyy 'às' HH:mm:ss", { locale: ptBR })
+              ? format(
+                  new Date(rawData as string),
+                  "dd/MM/yyyy 'às' HH:mm:ss",
+                  { locale: ptBR }
+                )
               : "Sem data"}
           </div>
         </div>
@@ -227,9 +246,11 @@ export const columns: ColumnDef<User>[] = [
     enableColumnFilter: true,
     filterFn: (row, columnId, filterValue) => {
       const value = row.getValue(columnId);
-      return filterValue === "all" ||
+      return (
+        filterValue === "all" ||
         (filterValue === "true" && value === true) ||
-        (filterValue === "false" && value === false);
+        (filterValue === "false" && value === false)
+      );
     },
   },
 ];
