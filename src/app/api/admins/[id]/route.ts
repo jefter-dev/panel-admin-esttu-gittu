@@ -6,6 +6,7 @@ import { handleRouteError } from "@/lib/handle-errors-utils";
 import { AuthenticationError, ValidationError } from "@/errors/custom.errors";
 import { z } from "zod";
 import { APP_DATABASE_ADMIN } from "@/lib/firebase-admin";
+
 /**
  * @swagger
  * /api/admins/{id}:

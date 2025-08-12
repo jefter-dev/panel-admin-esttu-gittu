@@ -1,5 +1,5 @@
 const nextConfig = {
-  output: "export",
+  output: undefined,
   images: {
     remotePatterns: [
       {
