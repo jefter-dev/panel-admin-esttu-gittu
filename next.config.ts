@@ -1,5 +1,8 @@
 const nextConfig = {
   output: undefined,
+  experimental: {
+    runtime: "nodejs",
+  },
   images: {
     remotePatterns: [
       {
