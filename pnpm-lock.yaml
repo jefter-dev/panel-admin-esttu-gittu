@@ -86,9 +86,6 @@ importers:
       next-themes:
         specifier: ^0.4.6
         version: 0.4.6(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
-      panel-admin-esttu-gittu:
-        specifier: 'link:'
-        version: 'link:'
       react:
         specifier: 19.1.1
         version: 19.1.1
