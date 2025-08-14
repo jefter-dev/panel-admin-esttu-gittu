@@ -113,6 +113,7 @@ export function UserDetailsRow({ user }: { user: User }) {
 
         <div className="space-y-4">
           <h4 className="font-bold text-foreground">Dados Pessoais</h4>
+          <DetailItem label="ID" value={user.cid || user.id} />
           <DetailItem label="CPF" value={user.cpf} />
           <DetailItem label="RG" value={user.rg} />
           <DetailItem label="Data de Nascimento" value={user.dataNascimento} />

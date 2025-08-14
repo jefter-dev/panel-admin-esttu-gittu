@@ -5,6 +5,7 @@ import { User } from "@/types/user";
 import {
   ArrowUpDown,
   ChevronRight,
+  Copy,
   Download,
   MoreHorizontal,
   QrCode,
@@ -144,6 +145,16 @@ export const columns: ColumnDef<User>[] = [
       const qrCodeUrl = getUrlQrCode(user);
       const canvasId = `qrcode-main-${user.idDocument}`;
 
+      const handleCopyId = async () => {
+        try {
+          await navigator.clipboard.writeText(user.cid || user.id);
+          // Aqui você pode colocar um toast de sucesso se usar algo como o shadcn/ui toast
+          // toast.success("ID copiado para a área de transferência!");
+        } catch (err) {
+          console.error("Erro ao copiar ID", err);
+        }
+      };
+
       return (
         <div className="text-right">
           <Dialog>
@@ -169,6 +180,15 @@ export const columns: ColumnDef<User>[] = [
                 >
                   <Download size={14} />
                   Baixar Foto
+                </DropdownMenuItem>
+
+                {/* Copiar ID */}
+                <DropdownMenuItem
+                  onClick={handleCopyId}
+                  className="cursor-pointer gap-2"
+                >
+                  <Copy size={14} />
+                  Copiar ID
                 </DropdownMenuItem>
 
                 <DialogTrigger asChild>
