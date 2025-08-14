@@ -48,11 +48,20 @@ export function usePaginatedUsers() {
           users: User[];
           hasNextPage: boolean;
         }>("/users", { params });
+
         const { users: fetchedUsers, hasNextPage: newHasNextPage } =
           response.data;
 
         setUsers(fetchedUsers ?? []);
         setHasNextPage(newHasNextPage);
+
+        // Só adiciona cursor se realmente houver próxima página
+        if (newHasNextPage && page >= cursors.length) {
+          const lastUser = fetchedUsers[fetchedUsers.length - 1];
+          if (lastUser) {
+            setCursors((prev) => [...prev, lastUser.nome]);
+          }
+        }
       } catch (error) {
         console.error("Erro ao buscar usuários:", error);
         if (isAxiosError(error)) {
@@ -68,7 +77,8 @@ export function usePaginatedUsers() {
     };
 
     loadUsers();
-  }, [page, filterNome, filterPagamento, pageSize, cursors]); // Adicionar 'cursors' aqui é a correção
+    // não incluir cursors aqui
+  }, [page, filterNome, filterPagamento, pageSize]);
 
   // EFEITO 2: Gerencia os cursors (Este efeito se tornou redundante, a lógica pode ser simplificada)
   useEffect(() => {
