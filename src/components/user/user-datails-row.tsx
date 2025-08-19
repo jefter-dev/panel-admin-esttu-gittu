@@ -132,7 +132,12 @@ export function UserDetailsRow({ user }: { user: User }) {
             />
             <DetailItem
               label="Endereço"
-              value={`${user.endereco}, ${user.numero}`}
+              value={
+                <div className="flex flex-col space-y-1">
+                  <span>{`${user.cidade} - ${user.estado}`}</span>
+                  <span>{`${user.endereco}, ${user.numero} - ${user.complemento}`}</span>
+                </div>
+              }
             />
           </div>
         ) : (
