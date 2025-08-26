@@ -134,7 +134,7 @@ export function UserDetailsRow({ user }: { user: User }) {
               label="Endereço"
               value={
                 <div className="flex flex-col space-y-1">
-                  <span>{`${user.cep}</span>
+                  <span>{user.cep}</span>
                   <span>{`${user.cidade} - ${user.estado}`}</span>
                   <span>{`${user.endereco}, ${user.numero} - ${user.complemento}`}</span>
                 </div>
