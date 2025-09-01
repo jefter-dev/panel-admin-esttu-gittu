@@ -48,7 +48,7 @@ export class AdminService {
       updateAt: nowISO,
       adminRegister: registeredByAdminId,
       adminUpdated: registeredByAdminId,
-      app: this.app,
+      app: payload.app || this.app,
     };
 
     const newAdmin = await this.adminRepository.create(payloadForRepo);
@@ -98,6 +98,24 @@ export class AdminService {
     await this.adminRepository.update(idToUpdate, dataToUpdate);
   }
 
+  /**
+   * Remove um administrador pelo ID.
+   * @param id O UUID do admin a ser removido.
+   * @param deletedByAdminId O ID do admin que está realizando a ação (para auditoria).
+   * @throws {RecordNotFoundError} Se o admin não existir.
+   */
+  async delete(id: string): Promise<void> {
+    // Primeiro verificamos se o admin existe
+    const adminToDelete = await this.adminRepository.findById(id);
+    if (!adminToDelete) {
+      throw new RecordNotFoundError(
+        "Administrador a ser removido não encontrado."
+      );
+    }
+
+    await this.adminRepository.delete(id);
+  }
+
   async findById(id: string): Promise<Omit<Admin, "password">> {
     // 1. Chama o repositório para buscar o registro no banco de dados.
     const admin = await this.adminRepository.findById(id);
@@ -114,5 +132,44 @@ export class AdminService {
     void password;
 
     return adminToReturn;
+  }
+
+  async findAll(): Promise<
+    Array<
+      Omit<Admin, "password"> & {
+        adminRegisterName?: string;
+        adminUpdatedName?: string;
+      }
+    >
+  > {
+    const admins = await this.adminRepository.findAll();
+
+    // Map de ID → nome para evitar múltiplas consultas repetidas
+    const adminIds = new Set<string>();
+    admins.forEach((a) => {
+      if (a.adminRegister) adminIds.add(a.adminRegister);
+      if (a.adminUpdated) adminIds.add(a.adminUpdated);
+    });
+
+    // Buscar todos os admins de uma vez
+    const adminDetails = await Promise.all(
+      Array.from(adminIds).map((id) => this.adminRepository.findById(id))
+    );
+
+    const idToNameMap = new Map<string, string>();
+    adminDetails.forEach((a) => {
+      if (a) idToNameMap.set(a.id, a.name);
+    });
+
+    // Retorna admins com nomes de adminRegister e adminUpdated, omitindo a senha
+    return admins.map((admin) => ({
+      ...admin,
+      adminRegisterName: admin.adminRegister
+        ? idToNameMap.get(admin.adminRegister)
+        : undefined,
+      adminUpdatedName: admin.adminUpdated
+        ? idToNameMap.get(admin.adminUpdated)
+        : undefined,
+    }));
   }
 }

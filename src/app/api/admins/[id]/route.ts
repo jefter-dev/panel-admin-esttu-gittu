@@ -265,3 +265,37 @@ export async function PATCH(
     return handleRouteError(error);
   }
 }
+
+// Rota DELETE para remover um admin
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    // 1. Autenticação
+    const authHeader = request.headers.get("Authorization");
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      throw new AuthenticationError("Token Bearer ausente ou malformado.");
+    }
+    const token = authHeader.split(" ")[1];
+    const session = await AuthService.verifyToken(token);
+    if (!session?.id || !session?.app) {
+      throw new AuthenticationError("Sessão inválida ou token expirado.");
+    }
+
+    // 2. ID do admin a ser removido
+    const { id } = await params;
+
+    // 3. Executa a remoção usando o serviço
+    const adminService = new AdminService(APP_DATABASE_ADMIN);
+    await adminService.delete(id); // session.id: quem está removendo
+
+    // 4. Retorna sucesso
+    return NextResponse.json(
+      { message: `Administrador removido com sucesso.` },
+      { status: 200 }
+    );
+  } catch (error) {
+    return handleRouteError(error);
+  }
+}

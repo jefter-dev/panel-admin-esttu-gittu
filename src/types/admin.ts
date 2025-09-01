@@ -18,6 +18,8 @@ export type Admin = {
   createAt: string; // Data em formato ISO (ex: "2023-10-27T10:00:00.000Z")
   updateAt: string; // Data em formato ISO
   app: APP;
+  adminRegisterName?: string;
+  adminUpdatedName?: string;
 };
 
 // Payload para CRIAR um novo admin

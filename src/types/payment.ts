@@ -1,11 +1,17 @@
-// src/types/payment.ts
-
+import { Timestamp } from "firebase-admin/firestore";
 import { APP } from "./app";
 
-// Status possíveis de um pagamento
-export type PaymentStatus = "CONFIRMED" | "PENDING" | "FAILED" | "REFUNDED";
+// Status possíveis de um pagamento (alinhado com o schema)
+export type PaymentStatus =
+  | "PENDING" // Aguardando Pagamento
+  | "PAID" // Pago
+  | "CANCELLED" // Cancelado
+  | "REFUNDED" // Estornado
+  | "BANK_PROCESSING" // Enviado para o banco
+  | "FAILED" // Falhou
+  | "AWAITING_CHECKOUT_RISK_ANALYSIS_REQUEST"; // Em análise
 
-// Métodos de pagamento que você aceita (ex: do Asaas)
+// Métodos de pagamento que você aceita (mesmo do schema)
 export type PaymentMethod = "CREDIT_CARD" | "PIX" | "BOLETO";
 
 export interface Payment {
@@ -15,10 +21,19 @@ export interface Payment {
   /** UUID do usuário que realizou o pagamento (relação com a coleção User) */
   userId: string;
 
+  /** Nome do cliente vindo do pagamento */
+  customerName: string;
+
+  /** CPF do cliente vindo do pagamento */
+  customerCpf: string;
+
   /** ID do pagamento gerado pelo gateway (ex: Asaas), para referência e evitar duplicatas */
   gatewayPaymentId: string;
 
-  /** Valor do pagamento em centavos para evitar problemas com ponto flutuante */
+  /** ID do evento do gateway (útil para auditoria de webhooks) */
+  gatewayEventId?: string;
+
+  /** Valor do pagamento em reais (mantido igual ao schema) */
   amount: number;
 
   /** Método de pagamento utilizado */
@@ -27,12 +42,25 @@ export interface Payment {
   /** Status atual do pagamento */
   status: PaymentStatus;
 
-  /** Timestamp de quando o registro foi criado */
-  createdAt: string;
+  /** Data/hora em que o pagamento foi confirmado no gateway (ISO 8601) */
+  paymentDate: Timestamp;
+
+  /** Timestamp de quando o registro foi criado no sistema (ISO 8601) */
+  createdAt?: Timestamp;
+
+  /** Descrição (ex: "Carteirinha Estudantil Física") */
+  description?: string;
+
+  /** Payload bruto do gateway (útil para auditoria e debugging) */
+  metadata?: Record<string, unknown>;
 
   /** A qual aplicação este pagamento pertence */
   app: APP;
 }
 
-// Payload para criar um novo registro de pagamento no repositório
-export type PaymentCreatePayload = Omit<Payment, "id">;
+export type PaymentCreatePayload = Payment; // inclui o id
+
+export interface PaymentsStats {
+  count: number;
+  totalAmount: number;
+}

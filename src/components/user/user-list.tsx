@@ -1,10 +1,11 @@
 "use client";
 
 import { UserDataTable } from "@/components/user/user-data-table";
-import { usePaginatedUsers } from "@/hooks/use-paginated-users";
-import { DataTableSkeleton } from "@/components/data-table-skeleton";
+import { usePaginatedUsers } from "@/hooks/user/use-paginated-users";
+import { DataTableUsersSkeleton } from "@/components/user/user-data-table-skeleton";
 import { columns } from "@/components/user/user-columns";
-import { useCallback } from "react"; // 1. Importe o useCallback
+import { useCallback } from "react";
+import { FilterType } from "@/types/filters-user";
 
 export default function UserList() {
   const {
@@ -12,27 +13,30 @@ export default function UserList() {
     page,
     pageSize,
     hasNextPage,
-    filterNome,
-    filterPagamento,
-    handleFilterChange,
+    search,
+    filterPayment,
+    handleFilterChange, // Esta é a função do hook usePaginatedUsers
     handlePageChange,
     handlePageSizeChange,
     isLoading,
   } = usePaginatedUsers();
 
-  // 2. Envolva a função 'onFilterChange' com useCallback
-  // Isso garante que a função só será recriada se 'handleFilterChange' mudar.
-  // Como 'handleFilterChange' também usa useCallback, ela é estável.
+  // 👇 AQUI ESTÁ A CORREÇÃO 👇
+  // Esta função agora aceita todos os filtros e os repassa corretamente
   const onFilterChange = useCallback(
-    (newFilters: { nome: string; pagamentoEfetuado?: boolean }) => {
-      const pagamentoValue =
-        newFilters.pagamentoEfetuado === undefined
-          ? "all"
-          : (String(newFilters.pagamentoEfetuado) as "true" | "false");
-
+    (newFilters: {
+      search: string;
+      pagamentoEfetuado?: boolean; // Recebe boolean
+      filterType?: FilterType;
+      filterValue?: string;
+    }) => {
+      // Chama a função do hook diretamente com os valores recebidos.
+      // O hook agora é responsável por gerenciar seu próprio estado interno.
       handleFilterChange({
-        nome: newFilters.nome,
-        pagamentoEfetuado: pagamentoValue,
+        search: newFilters.search,
+        pagamentoEfetuado: newFilters.pagamentoEfetuado, // Passa o boolean diretamente
+        filterType: newFilters.filterType,
+        filterValue: newFilters.filterValue,
       });
     },
     [handleFilterChange]
@@ -41,7 +45,7 @@ export default function UserList() {
   if (isLoading && users.length === 0) {
     return (
       <div className="p-10">
-        <DataTableSkeleton columnCount={columns.length} rowCount={15} />
+        <DataTableUsersSkeleton columnCount={columns.length} rowCount={10} />
       </div>
     );
   }
@@ -53,9 +57,9 @@ export default function UserList() {
         page={page}
         pageSize={pageSize}
         hasNextPage={hasNextPage}
-        filterNome={filterNome}
-        filterPagamento={filterPagamento}
-        onFilterChange={onFilterChange} // 3. Passe a função estável
+        search={search}
+        filterPagamento={filterPayment}
+        onFilterChange={onFilterChange} // Passando a função corrigida
         onPageChange={handlePageChange}
         onPageSizeChange={handlePageSizeChange}
       />

@@ -43,3 +43,20 @@ export async function POST(request: NextRequest) {
     return handleRouteError(error);
   }
 }
+
+// Rota GET: listar todos os admins
+export async function GET(request: NextRequest) {
+  try {
+    const session = await getSessionFromRequest(request);
+    if (!session?.id || !session?.app) {
+      throw new AuthenticationError();
+    }
+
+    const adminService = new AdminService(APP_DATABASE_ADMIN);
+    const admins = await adminService.findAll(); // Crie este método no service
+
+    return NextResponse.json(admins);
+  } catch (error) {
+    return handleRouteError(error);
+  }
+}

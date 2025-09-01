@@ -6,7 +6,7 @@ import { SecondarySidebar } from "@/components/layout/secondary-sidebar";
 import { Button } from "@/components/ui/button";
 import { Drawer, DrawerTrigger, DrawerContent } from "@/components/ui/drawer";
 import { Menu } from "lucide-react";
-import { useLogout } from "@/hooks/use-logout";
+import { useLogout } from "@/hooks/auth/use-logout";
 import { useEffect, useState } from "react";
 import { SECONDARY_SIDEBAR_PATHS } from "@/lib/navigation";
 // import { SECONDARY_SIDEBAR_PATHS } from '@/lib/navigation';

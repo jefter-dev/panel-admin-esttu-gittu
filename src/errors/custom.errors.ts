@@ -82,3 +82,10 @@ export class ConfigurationError extends Error {
     this.name = "ConfigurationError";
   }
 }
+
+export class WebhookError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "WebhookError";
+  }
+}

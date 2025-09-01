@@ -38,6 +38,8 @@ export class AuthService {
       admin.password
     );
 
+    console.log("isPasswordValid: ", isPasswordValid, password);
+
     if (!isPasswordValid) {
       throw new InvalidCredentialsError("E-mail ou senha inválidos.");
     }

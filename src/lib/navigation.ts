@@ -42,7 +42,7 @@ export const SECONDARY_NAV_ITEMS: NavigationItem[] = [
   {
     id: "payment",
     label: "Pagamentos",
-    href: "/payment",
+    href: "/payments",
     icon: Wallet,
   },
   {

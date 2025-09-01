@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { ZodError } from "zod";
+import z, { ZodError } from "zod";
 import {
   AuthenticationError,
   DataPersistenceError,
@@ -8,6 +8,7 @@ import {
   ValidationError,
   InvalidCredentialsError,
   ConfigurationError,
+  WebhookError,
 } from "@/errors/custom.errors";
 
 export const handleRouteError = (error: unknown): NextResponse => {
@@ -20,7 +21,9 @@ export const handleRouteError = (error: unknown): NextResponse => {
 
   if (error instanceof ConfigurationError) {
     return NextResponse.json(
-      { error: "Ocorreu um erro de configuração no servidor." },
+      {
+        error: error.message || "Ocorreu um erro de configuração no servidor.",
+      },
       { status: 500 }
     );
   }
@@ -44,6 +47,7 @@ export const handleRouteError = (error: unknown): NextResponse => {
   }
 
   if (error instanceof DuplicateRecordError) {
+    console.log("ERROR: ", error);
     return NextResponse.json({ error: error.message }, { status: 409 });
   }
 
@@ -57,9 +61,13 @@ export const handleRouteError = (error: unknown): NextResponse => {
 
   if (error instanceof ZodError) {
     return NextResponse.json(
-      { error: "Dados inválidos.", details: error.flatten() },
+      { error: "Dados inválidos.", details: z.treeifyError(error) },
       { status: 400 }
     );
+  }
+
+  if (error instanceof WebhookError) {
+    return NextResponse.json({ error: error.message }, { status: 401 });
   }
 
   console.error("[API_ERROR] Erro inesperado:", error);

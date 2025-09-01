@@ -4,7 +4,10 @@ import { v4 as uuidv4 } from "uuid";
 import { FirestoreBaseService } from "@/service/firebase/firestore-base.service";
 import type { Firestore } from "firebase-admin/firestore";
 import { Admin, AdminCreatePayload, AdminUpdatePayload } from "@/types/admin";
-import { DataPersistenceError } from "@/errors/custom.errors";
+import {
+  DataPersistenceError,
+  RecordNotFoundError,
+} from "@/errors/custom.errors";
 import { DATABASE_COLLECTION_ADMINS } from "@/lib/firebase-admin";
 
 export class AdminRepository extends FirestoreBaseService {
@@ -91,6 +94,8 @@ export class AdminRepository extends FirestoreBaseService {
    * @throws {Error} Se o documento com o ID fornecido não for encontrado.
    */
   async update(id: string, payload: AdminUpdatePayload): Promise<void> {
+    console.log("payload [UPDATE USER]: ", payload);
+
     try {
       const snapshot = await this.collection
         .where("id", "==", id)
@@ -112,6 +117,56 @@ export class AdminRepository extends FirestoreBaseService {
       throw new DataPersistenceError(
         "Falha ao atualizar administrador no banco de dados."
       );
+    }
+  }
+
+  /**
+   * Remove um administrador pelo seu ID (UUID).
+   * @param id O UUID do admin a ser removido.
+   * @throws {RecordNotFoundError} Se o admin não existir.
+   * @throws {DataPersistenceError} Se ocorrer algum erro no Firestore.
+   */
+  async delete(id: string): Promise<void> {
+    try {
+      const snapshot = await this.collection
+        .where("id", "==", id)
+        .limit(1)
+        .get();
+      if (snapshot.empty) {
+        throw new RecordNotFoundError(
+          `Administrador com ID ${id} não encontrado.`
+        );
+      }
+      const docRef = snapshot.docs[0].ref;
+      await docRef.delete();
+    } catch (error) {
+      console.error(
+        `[AdminRepository.delete] Erro ao remover admin com id ${id}:`,
+        error
+      );
+      if (error instanceof RecordNotFoundError) throw error;
+      throw new DataPersistenceError(
+        "Falha ao remover administrador do banco de dados."
+      );
+    }
+  }
+
+  /**
+   * Retorna todos os admins do Firestore.
+   */
+  async findAll(): Promise<Admin[]> {
+    try {
+      const snapshot = await this.collection.get();
+      const admins: Admin[] = snapshot.docs.map((doc) =>
+        this.mapDocTo<Admin>(doc)
+      );
+      return admins;
+    } catch (error) {
+      console.error(
+        "[AdminRepository.findAll] Erro ao buscar todos os admins:",
+        error
+      );
+      throw new DataPersistenceError("Falha ao listar administradores.");
     }
   }
 }

@@ -3,6 +3,7 @@ import { twMerge } from "tailwind-merge";
 import { apiClient } from "@/lib/http-client";
 import { PRIMARY_NAV_ITEMS, SECONDARY_NAV_ITEMS } from "@/lib/navigation";
 import { User } from "@/types/user";
+import { toast } from "sonner";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -53,10 +54,8 @@ export async function handleDownloadImage(url: string, filename: string) {
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(blobUrl);
-  } catch (err) {
-    console.error("Erro ao baixar imagem:", err);
-    // Opcional: Adicionar um toast de erro para o usuário
-    // toast.error("Não foi possível baixar a imagem.");
+  } catch {
+    toast.error("Não foi possível baixar a imagem.");
   }
 }
 
@@ -109,4 +108,59 @@ export function downloadCanvasAsPng(canvasId: string, filename: string) {
   link.href = canvas.toDataURL("image/png");
   link.download = `${filename}.png`;
   link.click();
+}
+
+// Funções auxiliares para identificar o tipo de busca
+export const isEmail = (term: string): boolean => {
+  // Regex simples para verificar se parece um e-mail
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(term);
+};
+
+export const isCPF = (term: string): boolean => {
+  // Verifica se o termo, após remover a formatação, contém apenas números e tem 11 dígitos
+  const cleaned = term.replace(/[.\-]/g, "");
+  return /^\d{11}$/.test(cleaned);
+};
+
+export const formatCPF = (cpf: string): string => {
+  // Garante que estamos trabalhando com uma string limpa de 11 dígitos
+  const cleaned = cpf.replace(/\D/g, "");
+  if (cleaned.length !== 11) {
+    // Retorna o original se não for um CPF válido para formatação
+    return cpf;
+  }
+  // Aplica a máscara XXX.XXX.XXX-XX
+  return cleaned.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
+};
+
+export const formatDateTime = (iso?: string) => {
+  if (!iso) return "";
+  const date = new Date(iso);
+  return new Intl.DateTimeFormat("pt-BR", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(date);
+};
+
+export function getStartAndEndOfMonthUTC(date: Date = new Date()): {
+  start: Date;
+  end: Date;
+} {
+  const year = date.getUTCFullYear();
+  const month = date.getUTCMonth();
+
+  const start = new Date(Date.UTC(year, month, 1, 0, 0, 0, 0));
+  const end = new Date(Date.UTC(year, month + 1, 0, 23, 59, 59, 999));
+
+  return { start, end };
+}
+
+export function formatCurrency(value: number) {
+  return value.toLocaleString("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  });
 }

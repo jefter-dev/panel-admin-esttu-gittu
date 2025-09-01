@@ -2,6 +2,6 @@
 
 import UserList from "@/components/user/user-list";
 
-export default function StudantsPage() {
+export default function UsersPage() {
   return <UserList />;
 }

@@ -1,23 +1,18 @@
-// src/service/payment.service.ts
-
 import { getFirebaseAdmin } from "@/lib/firebase-admin";
 import { APP } from "@/types/app";
 import { Payment, PaymentCreatePayload } from "@/types/payment";
 import { PaymentCreateInput } from "@/schemas/payment.schema";
-import { RecordNotFoundError } from "@/errors/custom.errors";
 import { PaymentRepository } from "@/repository/payment.repository";
-import { UserRepository } from "@/repository/user.repository";
+import { Timestamp } from "firebase-admin/firestore";
 
 export class PaymentService {
-  private app: APP;
   private paymentRepository: PaymentRepository;
-  private userRepository: UserRepository;
+  private app: APP;
 
   constructor(app: APP) {
     const db = getFirebaseAdmin(app);
     this.app = app;
     this.paymentRepository = new PaymentRepository(db);
-    this.userRepository = new UserRepository(db);
   }
 
   /**
@@ -27,40 +22,66 @@ export class PaymentService {
    * @throws {RecordNotFoundError} Se o usuário especificado no payload não for encontrado.
    */
   async createPayment(payload: PaymentCreateInput): Promise<Payment> {
-    // 1. Validação de regra de negócio: o usuário deve existir
-    // O ID do usuário agora vem do payload
-    const user = await this.userRepository.findById(payload.userId);
-    if (!user) {
-      throw new RecordNotFoundError(
-        `Usuário com ID ${payload.userId} não foi encontrado.`
-      );
-    }
-
-    // 2. Preparação dos dados para o repositório
     const payloadForRepo: PaymentCreatePayload = {
-      gatewayPaymentId: payload.gatewayPaymentId,
-      userId: payload.userId,
-      amount: payload.amount,
-      method: payload.method,
-      status: "CONFIRMED", // Assumindo que o pagamento sempre vem como confirmado
-      createdAt: payload.paymentDate, // Usamos a data fornecida na requisição
-      app: this.app,
+      ...payload,
+      paymentDate: Timestamp.fromDate(new Date(payload.paymentDate)), // <- conversão aqui
     };
 
-    // 3. Cria o registro de pagamento
-    const newPayment = await this.paymentRepository.create(payloadForRepo);
-
-    // 4. Orquestração: Atualiza o status no documento do usuário
-    await this.userRepository.update(payload.userId, {
-      pagamentoEfetuado: true,
-      dataPagamento: payload.paymentDate, // Usa a mesma data do pagamento
-    });
-
-    return newPayment;
+    return await this.paymentRepository.create(payloadForRepo);
   }
 
   // O método getPaymentsForUser permanece o mesmo, pois ele já recebia o userId
   async getPaymentsForUser(userId: string): Promise<Payment[]> {
     return this.paymentRepository.findByUserId(userId);
+  }
+
+  async list(options: {
+    limit?: number;
+    startAfter?: string;
+    search?: string;
+    dateFrom: string;
+    dateTo: string;
+  }): Promise<Payment[]> {
+    return this.paymentRepository.find(this.app, options);
+  }
+
+  /**
+   * Retorna os pagamentos do mês corrente, agrupados por dia.
+   * Útil para gráficos.
+   */
+  async getPaymentsCurrentMonth(
+    app: APP
+  ): Promise<{ date: string; total: number }[]> {
+    return this.paymentRepository.getPaymentsCurrentMonth(app);
+  }
+
+  async getTotalAmountByDateRange(
+    app: APP,
+    dateFrom: string,
+    dateTo: string
+  ): Promise<number> {
+    return this.paymentRepository.getTotalAmountByDateRange(
+      app,
+      dateFrom,
+      dateTo
+    );
+  }
+
+  /**
+   * Retorna o valor total de pagamentos do dia atual.
+   */
+  async getPaymentsSummaryToday(
+    app: APP
+  ): Promise<{ count: number; totalAmount: number }> {
+    return this.paymentRepository.getPaymentsSummaryToday(app);
+  }
+
+  /**
+   * Retorna a quantidade e o valor total de pagamentos do mês corrente.
+   */
+  async getPaymentsSummaryCurrentMonth(
+    app: APP
+  ): Promise<{ count: number; totalAmount: number }> {
+    return this.paymentRepository.getPaymentsSummaryCurrentMonth(app);
   }
 }

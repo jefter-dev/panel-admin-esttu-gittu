@@ -2,6 +2,7 @@ import "server-only";
 import { SignJWT, jwtVerify } from "jose";
 import { SessionPayload, Tokens } from "@/types/sessions";
 import ms, { StringValue } from "ms";
+import { ConfigurationError } from "@/errors/custom.errors";
 
 export interface ITokenService {
   generateTokens(payload: SessionPayload): Promise<Tokens>;
@@ -11,12 +12,14 @@ export interface ITokenService {
 function parseMsEnvVar(envVarName: string): number {
   const value = process.env[envVarName];
   if (!value) {
-    throw new Error(`A variável de ambiente ${envVarName} não está definida.`);
+    throw new ConfigurationError(
+      `A variável de ambiente ${envVarName} não está definida.`
+    );
   }
 
   const msValue = ms(value as unknown as StringValue);
   if (typeof msValue !== "number" || isNaN(msValue) || msValue <= 0) {
-    throw new Error(
+    throw new ConfigurationError(
       `A variável de ambiente ${envVarName} tem formato inválido: "${value}".`
     );
   }
@@ -31,15 +34,16 @@ export class TokenService implements ITokenService {
 
   constructor() {
     if (!process.env.JWT_SECRET) {
-      throw new Error("A variável de ambiente JWT_SECRET não está definida.");
+      throw new ConfigurationError(
+        "A variável de ambiente JWT_SECRET não está definida."
+      );
     }
 
     this.secretKey = new TextEncoder().encode(process.env.JWT_SECRET);
 
-    // MUDANÇA: Obter as strings de expiração diretamente das variáveis de ambiente
     const accessTokenExp = process.env.JWT_ACCESS_TOKEN_EXPIRES_IN;
     if (!accessTokenExp) {
-      throw new Error(
+      throw new ConfigurationError(
         "A variável de ambiente JWT_ACCESS_TOKEN_EXPIRES_IN não está definida."
       );
     }
@@ -47,7 +51,7 @@ export class TokenService implements ITokenService {
 
     const refreshTokenExp = process.env.JWT_REFRESH_TOKEN_EXPIRES_IN;
     if (!refreshTokenExp) {
-      throw new Error(
+      throw new ConfigurationError(
         "A variável de ambiente JWT_REFRESH_TOKEN_EXPIRES_IN não está definida."
       );
     }

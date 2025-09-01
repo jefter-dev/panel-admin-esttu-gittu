@@ -10,14 +10,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useSession } from "@/context/session-context";
-import { useLogout } from "@/hooks/use-logout";
+import { useLogout } from "@/hooks/auth/use-logout";
 import {
   ChevronDown,
-  KeyRound,
   LogOut,
   Settings,
-  Store,
   UserCircle,
+  UserStar,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -38,7 +37,7 @@ export function UserDropdown() {
           data-cy="user-dropdown-trigger"
           disabled={isSessionLoading}
         >
-          <Store className="mr-2 h-4 w-4" />
+          <UserStar className="mr-2 h-4 w-4" />
           <span className="truncate max-w-28">{buttonText}</span>
           <ChevronDown className="ml-2 h-4 w-4 opacity-70" />
         </Button>
@@ -69,16 +68,6 @@ export function UserDropdown() {
           >
             <Settings className="mr-2 h-4 w-4" />
             Configurações
-          </DropdownMenuItem>
-        </Link>
-
-        <Link href="/api-keys" passHref>
-          <DropdownMenuItem
-            className="cursor-pointer"
-            data-cy="user-dropdown-apikeys-item"
-          >
-            <KeyRound className="mr-2 h-4 w-4" />
-            API Keys
           </DropdownMenuItem>
         </Link>
 

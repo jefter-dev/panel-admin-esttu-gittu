@@ -8,7 +8,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-export function DataTableSkeleton({
+export function DataTableUsersSkeleton({
   columnCount,
   rowCount = 10,
 }: {
@@ -20,8 +20,8 @@ export function DataTableSkeleton({
       {/* Skeleton para a Barra de Ferramentas (Filtros) */}
       <div className="flex items-center justify-between py-4">
         <div className="flex items-center gap-4">
-          <Skeleton className="h-10 w-64" />
-          <Skeleton className="h-10 w-48" />
+          <Skeleton className="h-8 w-95" />
+          <Skeleton className="h-8 w-48" />
         </div>
       </div>
 
@@ -52,7 +52,7 @@ export function DataTableSkeleton({
                         </div>
                       </div>
                     ) : (
-                      <Skeleton className="h-4 w-full" />
+                      <Skeleton className="h-4 w-10" />
                     )}
                   </TableCell>
                 ))}
@@ -63,12 +63,13 @@ export function DataTableSkeleton({
       </div>
 
       {/* Skeleton para a Paginação */}
-      <div className="flex items-center justify-end space-x-2 py-4">
+      <div className="flex items-center justify-end gap-4 py-4">
+        {/* Indicador de página */}
         <Skeleton className="h-4 w-20" />
-        <div className="space-x-2">
-          <Skeleton className="h-9 w-24" />
-          <Skeleton className="h-9 w-24" />
-        </div>
+
+        {/* Botões anterior / próximo */}
+        <Skeleton className="h-9 w-24" />
+        <Skeleton className="h-9 w-24" />
       </div>
     </div>
   );

@@ -4,9 +4,7 @@
  *   get:
  *     summary: Busca uma lista paginada e filtrada de usuários
  *     description: >
- *       Retorna uma lista de usuários com suporte para paginação baseada em cursor e filtros
- *       por nome e status de pagamento. Requer autenticação de administrador.
- *       O escopo da busca é limitado à aplicação ('app') do administrador autenticado.
+ *       Retorna uma lista de usuários com suporte para paginação baseada em cursor e filtros dinâmicos.
  *     tags:
  *       - Users
  *     security:
@@ -17,22 +15,33 @@
  *         schema:
  *           type: integer
  *           default: 15
- *         description: O número de usuários a serem retornados por página.
+ *         description: O número de usuários a serem retornados.
  *       - in: query
  *         name: startAfter
  *         schema:
  *           type: string
- *         description: O cursor para a próxima página (o 'nome' do último usuário da página anterior).
+ *         description: O cursor para a próxima página.
  *       - in: query
  *         name: pagamentoEfetuado
  *         schema:
  *           type: boolean
- *         description: Filtra usuários por status de pagamento (true ou false). Se não fornecido, busca todos.
+ *         description: Filtra por status de pagamento.
  *       - in: query
- *         name: nome
+ *         name: search
  *         schema:
  *           type: string
- *         description: Filtra usuários cujo nome começa com o valor fornecido (case-insensitive).
+ *         description: Busca por nome, CPF ou e-mail.
+ *       - in: query
+ *         name: filterType
+ *         schema:
+ *           type: string
+ *           enum: [escola, cidade, estado]
+ *         description: O campo pelo qual filtrar (requer filterValue).
+ *       - in: query
+ *         name: filterValue
+ *         schema:
+ *           type: string
+ *         description: O valor a ser usado no filtro (requer filterType).
  *     responses:
  *       '200':
  *         description: Lista de usuários retornada com sucesso.
@@ -123,6 +132,7 @@ import { isValidAppName } from "@/lib/auth/session";
 import { AuthenticationError, ValidationError } from "@/errors/custom.errors";
 import { APP } from "@/types/app";
 import { UserService } from "@/service/user.service";
+import { ALLOWED_FILTER_TYPES, AllowedFilterType } from "@/types/filters-user";
 
 export async function GET(request: NextRequest) {
   try {
@@ -135,7 +145,18 @@ export async function GET(request: NextRequest) {
     const { searchParams } = request.nextUrl;
     const limit = parseInt(searchParams.get("limit") || "15", 10);
     const startAfter = searchParams.get("startAfter") || undefined;
-    const nome = searchParams.get("nome") || undefined;
+    const search = searchParams.get("search") || undefined;
+
+    // 👇 AQUI ESTÁ A MUDANÇA 👇
+    const filterTypeParam = searchParams.get("filterType");
+    const filterValue = searchParams.get("filterValue") || undefined;
+
+    // Validação para garantir que o filterType é um dos valores permitidos
+    const filterType =
+      filterTypeParam &&
+      ALLOWED_FILTER_TYPES.includes(filterTypeParam as AllowedFilterType)
+        ? (filterTypeParam as AllowedFilterType)
+        : undefined;
 
     let pagamentoEfetuado: boolean | undefined;
     if (searchParams.has("pagamentoEfetuado")) {
@@ -156,7 +177,9 @@ export async function GET(request: NextRequest) {
       limit: queryLimit,
       startAfterName: startAfter,
       pagamentoEfetuado: pagamentoEfetuado,
-      nome: nome,
+      search: search,
+      filterType: filterType, // Passa o tipo validado
+      filterValue: filterValue, // Passa o valor
     });
 
     const hasNextPage = usersWithExtra.length > limit;

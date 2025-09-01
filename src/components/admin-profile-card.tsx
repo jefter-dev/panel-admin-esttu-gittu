@@ -1,6 +1,6 @@
 "use client";
 
-import { useAdminDetails } from "@/hooks/use-admin-details";
+import { useAdminDetails } from "@/hooks/admin/use-admin-details";
 
 // Componentes de UI
 import {

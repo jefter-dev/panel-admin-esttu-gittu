@@ -1,5 +1,6 @@
 // src/schemas/admin.ts
 import { Role } from "@/types/admin";
+import { APP_VALUES } from "@/types/app";
 import z from "zod";
 
 // ===================================================
@@ -15,6 +16,7 @@ export const adminCreateSchema = z.object({
     .string({ error: "A senha é obrigatória." })
     .min(6, "A senha deve ter pelo menos 6 caracteres."),
   role: z.enum(Role, { error: "A função (role) é obrigatória." }),
+  app: z.enum(APP_VALUES),
 });
 
 // ===================================================
@@ -32,10 +34,14 @@ export const adminUpdateSchema = z
     // A senha é opcional. Se não for enviada, não será alterada.
     password: z
       .string()
-      .min(6, "A senha deve ter pelo menos 6 caracteres.")
-      .optional(),
+      .optional()
+      .refine((val) => !val || val.length >= 6, {
+        message: "A senha deve ter pelo menos 6 caracteres",
+      }),
+
     // O papel também é opcional.
-    role: z.enum(Role).optional(),
+    role: z.enum(Role),
+    app: z.enum(APP_VALUES),
   })
   // O refine garante que o cliente não envie um corpo de requisição vazio: {}
   .refine((data) => Object.keys(data).length > 0, {

@@ -7,6 +7,7 @@ import {
   RecordNotFoundError,
 } from "@/errors/custom.errors";
 import { User, UserCreatePayload, UserUpdatePayload } from "@/types/user";
+import { FilterType, FilterValue } from "@/types/filters-user";
 
 export class UserService {
   private app: APP;
@@ -49,7 +50,8 @@ export class UserService {
   }
 
   async update(id: string, payload: UserUpdatePayload): Promise<void> {
-    const userToUpdate = await this.userRepository.findById(id);
+    const userToUpdate = await this.userRepository.findByDocumentId(id);
+
     if (!userToUpdate) {
       throw new RecordNotFoundError("Usuário a ser atualizado não encontrado.");
     }
@@ -72,8 +74,38 @@ export class UserService {
     await this.userRepository.update(id, payload);
   }
 
-  async findById(id: string): Promise<Omit<User, "senha">> {
-    const user = await this.userRepository.findById(id);
+  async updateByDocumentId(
+    idDocument: string,
+    payload: UserUpdatePayload
+  ): Promise<void> {
+    const userToUpdate = await this.userRepository.findByDocumentId(idDocument);
+    if (!userToUpdate) {
+      throw new RecordNotFoundError("Usuário a ser atualizado não encontrado.");
+    }
+
+    // Verifica duplicidade de e-mail
+    if (payload.email && payload.email !== userToUpdate.email) {
+      const existingUserWithNewEmail = await this.userRepository.getByEmail(
+        payload.email
+      );
+      if (existingUserWithNewEmail) {
+        throw new DuplicateRecordError(
+          "O novo e-mail fornecido já está em uso."
+        );
+      }
+    }
+
+    // Se senha foi enviada, gera hash antes de salvar
+    if (payload.senha) {
+      payload.senha = await this.passwordService.hash(payload.senha);
+    }
+
+    // Atualiza no repositório diretamente pelo idDocument
+    await this.userRepository.updateByDocumentId(idDocument, payload);
+  }
+
+  async findByDocumentId(id: string): Promise<Omit<User, "senha">> {
+    const user = await this.userRepository.findByDocumentId(id);
     if (!user) {
       throw new RecordNotFoundError("Usuário não encontrado.");
     }
@@ -87,8 +119,18 @@ export class UserService {
     limit?: number;
     startAfterName?: string;
     pagamentoEfetuado?: boolean;
-    nome?: string;
+    search?: string;
+    filterType?: FilterType; // Passa o tipo validado
+    filterValue?: FilterValue; // Passa o valor
   }): Promise<User[]> {
     return this.userRepository.find(options);
+  }
+
+  async countPaymentsConfirmed(): Promise<number> {
+    return this.userRepository.countPaymentsConfirmed();
+  }
+
+  async countTotalUsers(): Promise<number> {
+    return this.userRepository.countTotalUsers();
   }
 }

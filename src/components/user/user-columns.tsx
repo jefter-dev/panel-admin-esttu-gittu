@@ -1,40 +1,16 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { User } from "@/types/user";
-import {
-  ArrowUpDown,
-  ChevronRight,
-  Copy,
-  Download,
-  MoreHorizontal,
-  QrCode,
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { QRCode } from "react-qrcode-logo";
-import {
-  downloadCanvasAsPng,
-  getUrlQrCode,
-  handleDownloadImage,
-} from "@/lib/utils";
+import { ChevronRight } from "lucide-react";
 
-// As primeiras colunas permanecem as mesmas
+import { User } from "@/types/user";
+
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { DataTableColumnHeader } from "@/components/data-table-column-header";
+import { UserDataTableActions } from "@/components/user/user-data-table-actions";
+import { UserCell } from "@/components/user/user-cell";
+
 export const columns: ColumnDef<User>[] = [
   {
     id: "expander",
@@ -55,63 +31,38 @@ export const columns: ColumnDef<User>[] = [
         <span className="sr-only">Detalhes</span>
       </Button>
     ),
+    // Desabilitar ordenação e ocultação para esta coluna
+    enableSorting: false,
+    enableHiding: false,
   },
   {
-    id: "user",
     accessorKey: "nome",
     header: ({ column }) => (
-      <Button
-        variant="ghost"
-        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-      >
-        Usuário
-        <ArrowUpDown className="ml-2 h-4 w-4" />
-      </Button>
+      <DataTableColumnHeader column={column} title="Usuário" />
     ),
-    cell: ({ row }) => {
-      const user = row.original;
-      const initial =
-        (user.nome?.charAt(0) ?? "") + (user.sobrenome?.charAt(0) ?? "");
-
-      return (
-        <div className="flex items-center gap-3">
-          <Avatar className="h-10 w-10">
-            <AvatarImage src={user.fotoIdentificacao} alt={user.nome} />
-            <AvatarFallback>{initial}</AvatarFallback>
-          </Avatar>
-          <div className="flex flex-col">
-            <span className="font-medium text-foreground">
-              {user.nome} {user.sobrenome}
-            </span>
-            <span className="text-xs text-muted-foreground">{user.email}</span>
-          </div>
-        </div>
-      );
-    },
+    cell: ({ row }) => <UserCell user={row.original} />,
   },
   {
     accessorKey: "cpf",
-    header: "CPF",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="CPF" />
+    ),
     cell: ({ row }) => (
-      <div className="w-[150px] truncate">{row.getValue("cpf")}</div>
+      <div className="w-[120px] truncate font-mono text-sm">
+        {row.getValue("cpf")}
+      </div>
     ),
   },
   {
     accessorKey: "celular",
-    header: "Telefone",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Telefone" />
+    ),
   },
   {
     accessorKey: "pagamentoEfetuado",
     header: ({ column }) => (
-      <div className="text-center">
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Pagamento
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      </div>
+      <DataTableColumnHeader column={column} title="Pagamento" />
     ),
     cell: ({ row }) => {
       const isPago = row.getValue("pagamentoEfetuado");
@@ -123,6 +74,7 @@ export const columns: ColumnDef<User>[] = [
         </div>
       );
     },
+    // Função de filtro personalizada para o status do pagamento
     filterFn: (row, columnId, filterValue) => {
       const value = row.getValue(columnId);
       return (
@@ -132,107 +84,14 @@ export const columns: ColumnDef<User>[] = [
       );
     },
   },
-
-  // =========================================================
-  // COLUNA DE AÇÕES MODIFICADA
-  // =========================================================
   {
     id: "actions",
     header: () => <div className="text-right">Ações</div>,
     cell: ({ row }) => {
       const user = row.original;
-
-      const qrCodeUrl = getUrlQrCode(user);
-      const canvasId = `qrcode-main-${user.idDocument}`;
-
-      const handleCopyId = async () => {
-        try {
-          await navigator.clipboard.writeText(user.cid || user.id);
-          // Aqui você pode colocar um toast de sucesso se usar algo como o shadcn/ui toast
-          // toast.success("ID copiado para a área de transferência!");
-        } catch (err) {
-          console.error("Erro ao copiar ID", err);
-        }
-      };
-
-      return (
-        <div className="text-right">
-          <Dialog>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="h-8 w-8 p-0 cursor-pointer">
-                  <span className="sr-only">Abrir menu</span>
-                  <MoreHorizontal className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuLabel>Ações</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  disabled={!user.fotoIdentificacao}
-                  onClick={() =>
-                    handleDownloadImage(
-                      user.fotoIdentificacao!,
-                      "foto-identificacao.jpg"
-                    )
-                  }
-                  className="cursor-pointer gap-2"
-                >
-                  <Download size={14} />
-                  Baixar Foto
-                </DropdownMenuItem>
-
-                {/* Copiar ID */}
-                <DropdownMenuItem
-                  onClick={handleCopyId}
-                  className="cursor-pointer gap-2"
-                >
-                  <Copy size={14} />
-                  Copiar ID
-                </DropdownMenuItem>
-
-                <DialogTrigger asChild>
-                  <DropdownMenuItem className="cursor-pointer gap-2">
-                    <QrCode size={14} />
-                    Visualizar QR Code
-                  </DropdownMenuItem>
-                </DialogTrigger>
-
-                <DropdownMenuSeparator />
-                <DropdownMenuItem className="cursor-pointer text-destructive focus:text-destructive focus:bg-destructive/10">
-                  Editar/Excluir
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-
-            <DialogContent className="max-w-xs">
-              <div className="flex justify-center p-4">
-                <QRCode
-                  value={qrCodeUrl}
-                  size={800}
-                  style={{ width: 400, height: 400 }}
-                  bgColor="#ffffff"
-                  fgColor="#000000"
-                  quietZone={6}
-                  id={canvasId}
-                  ecLevel="H"
-                  qrStyle="dots"
-                />
-              </div>
-              <DialogFooter>
-                <Button
-                  className="cursor-pointer gap-2"
-                  onClick={() =>
-                    downloadCanvasAsPng(canvasId, `qrcode-${user.idDocument}`)
-                  }
-                >
-                  <Download size={14} /> Baixar QR Code
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
-        </div>
-      );
+      return <UserDataTableActions user={user} />;
     },
+    enableSorting: false,
+    enableHiding: false,
   },
 ];

@@ -66,7 +66,7 @@ export interface User {
    * A URL para a foto de identificação (selfie) do usuário.
    * @example "https://example.com/fotos/selfie.jpg"
    */
-  fotoIdentificacao: string;
+  fotoIdentificacao?: string | null | undefined;
 
   /**
    * O hash da senha do usuário. **Este campo nunca deve ser enviado ao cliente.**
@@ -112,7 +112,7 @@ export interface User {
    * O complemento do endereço (apto, bloco, etc.).
    * @optional Exclusivo para 'esttu'.
    */
-  complemento?: string;
+  complemento?: string | null;
 
   /**
    * O CEP (Código de Endereçamento Postal).
@@ -160,13 +160,13 @@ export interface User {
    * A URL para o documento de matrícula do estudante.
    * @optional Exclusivo para 'esttu'.
    */
-  documentMatricula?: string;
+  documentMatricula?: string | null;
 
   /**
    * A URL para um documento de identificação com foto (RG, CNH).
    * @optional Exclusivo para 'esttu'.
    */
-  documentoComFoto?: string;
+  documentoComFoto?: string | null;
 
   // ======================================================
   // CAMPOS ESPECÍFICOS DA APLICAÇÃO 'GITTU'

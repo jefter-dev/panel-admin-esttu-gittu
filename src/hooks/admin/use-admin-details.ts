@@ -1,14 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import axios, { isAxiosError } from "axios";
+import { isAxiosError } from "axios";
 import { toast } from "sonner";
-import { SessionAdapter } from "@/lib/session-adapter";
 import { SessionPayload } from "@/types/sessions";
-import { Admin } from "@/types/admin"; // 1. Importe o tipo Admin
+import { Admin } from "@/types/admin";
+import { apiClient } from "@/lib/http-client";
 
 export function useAdminDetails(session: SessionPayload | null) {
-  // 2. O estado agora armazena um 'Admin'
   const [adminDetails, setAdminDetails] = useState<Admin | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -21,21 +20,7 @@ export function useAdminDetails(session: SessionPayload | null) {
     const fetchAdminDetails = async () => {
       setIsLoading(true);
       try {
-        const accessToken = await SessionAdapter.getAccessToken();
-
-        if (!accessToken) {
-          toast.error("Sessão inválida. Por favor, faça login novamente.");
-          setIsLoading(false);
-          return;
-        }
-
-        // 3. A URL da API agora aponta para o endpoint de administradores
-        const response = await axios.get<Admin>(`/api/admins/${session.id}`, {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        });
-
+        const response = await apiClient.get<Admin>(`/admins/${session.id}`);
         setAdminDetails(response.data);
       } catch (err) {
         console.error("Erro ao buscar detalhes do admin:", err);
@@ -55,6 +40,5 @@ export function useAdminDetails(session: SessionPayload | null) {
     fetchAdminDetails();
   }, [session]);
 
-  // 4. Retorna os detalhes do admin
   return { adminDetails, isLoading };
 }

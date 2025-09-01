@@ -10,7 +10,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Image from "next/image";
-import { useLogin } from "@/hooks/use-login";
+import { useLogin } from "@/hooks/auth/use-login";
 import { loginSchema } from "@/schemas/login.schema";
 
 type LoginFormData = z.infer<typeof loginSchema>;
