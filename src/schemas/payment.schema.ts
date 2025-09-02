@@ -54,9 +54,12 @@ export const paymentCreateSchema = z.object({
   }),
 
   // Data do pagamento (ISO 8601 vinda do gateway)
-  paymentDate: z.iso.datetime({
-    message: "A data do pagamento deve estar no formato ISO 8601.",
-  }),
+  paymentDate: z
+    .string()
+    .pipe(z.coerce.date())
+    .refine((date) => !isNaN(date.getTime()), {
+      message: "A data do pagamento deve estar no formato ISO 8601.",
+    }),
 
   // Descrição (ex: "Carteirinha Estudantil Física")
   description: z.string().optional(),
