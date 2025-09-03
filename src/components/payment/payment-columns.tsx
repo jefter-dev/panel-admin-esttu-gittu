@@ -11,7 +11,6 @@ export const columns: ColumnDef<Payment>[] = [
     cell: ({ row }) => {
       const payment = row.original;
       const gatewayPaymentId = payment.gatewayPaymentId;
-      const rowIndex = row.index + 1; // índice da linha
 
       return (
         <div className="flex items-center gap-2">

@@ -1,11 +1,5 @@
 import * as React from "react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "../ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { PaymentsTodayTable } from "../payment/payments-today-table";
 
 export function TablePaymentsToday() {

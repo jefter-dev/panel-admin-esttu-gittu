@@ -140,7 +140,7 @@ export function DataTableToolbar<TData>({
         </div>
 
         {/* 👇 MUDANÇA 4: Agrupador para os botões para que fiquem juntos e se adaptem melhor. */}
-        <div className="flex items-center gap-2 w-full lg:w-auto">
+        <div className="flex flex-col lg:flex-row items-center gap-2 w-full lg:w-auto">
           <Button
             variant="default"
             className="w-full lg:w-auto cursor-pointer"
@@ -150,7 +150,7 @@ export function DataTableToolbar<TData>({
             <Search className="mr-2 h-4 w-4" />
             Pesquisar
           </Button>
-          {/* 
+
           <Button
             variant="outline"
             className="w-full lg:w-auto cursor-pointer"
@@ -158,7 +158,7 @@ export function DataTableToolbar<TData>({
           >
             <SearchX className="mr-2 h-4 w-4" />
             Limpar
-          </Button> */}
+          </Button>
         </div>
       </div>
     </div>

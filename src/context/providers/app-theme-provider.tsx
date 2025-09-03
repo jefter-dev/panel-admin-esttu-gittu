@@ -6,8 +6,6 @@ import { useSession } from "@/context/session-context";
 export function AppThemeProvider({ children }: { children: React.ReactNode }) {
   const { user, isLoading } = useSession();
 
-  if (isLoading) return null;
-
   useEffect(() => {
     const root = window.document.documentElement;
     const APP_THEME_CLASSES = ["theme-esttu", "theme-gittu"];
@@ -20,6 +18,8 @@ export function AppThemeProvider({ children }: { children: React.ReactNode }) {
       }
     }
   }, [user]);
+
+  if (isLoading) return null;
 
   return <>{children}</>;
 }

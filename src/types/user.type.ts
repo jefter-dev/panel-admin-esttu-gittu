@@ -54,7 +54,7 @@ export interface User {
    * O número do RG (Registro Geral) do usuário.
    * @example "123456789"
    */
-  rg: string;
+  rg?: string | null | undefined;
 
   /**
    * A data de nascimento do usuário no formato "dd/mm/aaaa".

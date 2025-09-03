@@ -7,7 +7,6 @@ import {
   LayoutPanelLeft,
   Wallet,
   UserSquare,
-  IdCard,
   UserCog,
 } from "lucide-react";
 

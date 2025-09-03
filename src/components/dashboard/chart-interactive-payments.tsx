@@ -40,6 +40,10 @@ export type PaymentChartItem = {
   total: number;
 };
 
+// 🔹 Tipos auxiliares
+export type TimeRange = "7d" | "30d" | "90d";
+export type ChartType = "area" | "bar";
+
 const chartConfig = {
   payments: {
     label: "Pagamentos",
@@ -48,8 +52,8 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 export function ChartInteractivePayments() {
-  const [timeRange, setTimeRange] = React.useState<"7d" | "30d" | "90d">("7d");
-  const [chartType, setChartType] = React.useState<"area" | "bar">("bar");
+  const [timeRange, setTimeRange] = React.useState<TimeRange>("7d");
+  const [chartType, setChartType] = React.useState<ChartType>("bar");
 
   const { payments, isLoading } = usePaymentsByPeriod(timeRange);
 
@@ -74,7 +78,9 @@ export function ChartInteractivePayments() {
           <ToggleGroup
             type="single"
             value={timeRange}
-            onValueChange={(v) => v && setTimeRange(v as any)}
+            onValueChange={(v: string) => {
+              if (v) setTimeRange(v as TimeRange);
+            }}
             variant="outline"
             className="hidden @[767px]/card:flex"
           >
@@ -88,9 +94,10 @@ export function ChartInteractivePayments() {
               Últimos 7 dias
             </ToggleGroupItem>
           </ToggleGroup>
+
           <Select
             value={timeRange}
-            onValueChange={(v) => setTimeRange(v as any)}
+            onValueChange={(v: TimeRange) => setTimeRange(v)}
           >
             <SelectTrigger
               className="w-40 @[767px]/card:hidden cursor-pointer"
@@ -108,7 +115,7 @@ export function ChartInteractivePayments() {
           {/* Select do tipo de gráfico */}
           <Select
             value={chartType}
-            onValueChange={(v) => setChartType(v as any)}
+            onValueChange={(v: ChartType) => setChartType(v)}
           >
             <SelectTrigger className="w-32 cursor-pointer" size="sm">
               <SelectValue placeholder="Tipo de gráfico" />
