@@ -1,6 +1,6 @@
 // src/schemas/admin.ts
-import { Role } from "@/types/admin";
-import { APP_VALUES } from "@/types/app";
+import { Role } from "@/types/admin.type";
+import { APP_VALUES } from "@/types/app.type";
 import z from "zod";
 
 // ===================================================

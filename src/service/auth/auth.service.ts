@@ -1,8 +1,8 @@
 import { AdminRepository } from "@/repository/admin.repository";
-import { SessionPayload, Tokens } from "@/types/sessions";
-import { PasswordService } from "./password.service";
-import { TokenService } from "./token.service";
-import { APP } from "@/types/app";
+import { SessionPayload, Tokens } from "@/types/sessions-type";
+import { PasswordService } from "@/service/auth/password.service";
+import { TokenService } from "@/service/auth/token.service";
+import { APP } from "@/types/app.type";
 import { getFirebaseAdmin } from "@/lib/firebase-admin";
 import { InvalidCredentialsError } from "@/errors/custom.errors";
 

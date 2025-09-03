@@ -2,9 +2,9 @@ import { v4 as uuidv4 } from "uuid";
 import type { Firestore, Query } from "firebase-admin/firestore";
 import { FirestoreBaseService } from "@/service/firebase/firestore-base.service";
 import { DataPersistenceError } from "@/errors/custom.errors";
-import { User, UserCreatePayload, UserUpdatePayload } from "@/types/user";
+import { User, UserCreatePayload, UserUpdatePayload } from "@/types/user.type";
 import { formatCPF, isCPF, isEmail } from "@/lib/utils";
-import { FilterType, FilterValue } from "@/types/filters-user";
+import { FilterType, FilterValue } from "@/types/filters-user.type";
 
 export class UserRepository extends FirestoreBaseService {
   private collection: FirebaseFirestore.CollectionReference;
@@ -151,13 +151,15 @@ export class UserRepository extends FirestoreBaseService {
 
   async find(options: {
     limit?: number;
+    startAfter?: string; // idDocument do último item retornado
     pagamentoEfetuado?: boolean;
     search?: string;
-    filterType?: FilterType; // Agora aceita ""
+    filterType?: FilterType;
     filterValue?: FilterValue;
   }): Promise<User[]> {
     const {
       limit = 20,
+      startAfter,
       pagamentoEfetuado,
       search,
       filterType,
@@ -166,8 +168,7 @@ export class UserRepository extends FirestoreBaseService {
 
     try {
       // ===================================================================
-      // LÓGICA 1: FILTRO AVANÇADO (PRIORIDADE MÁXIMA)
-      // Se filterType e filterValue estão presentes, ignora o 'search'.
+      // LÓGICA 1: FILTRO AVANÇADO (priority > search)
       // ===================================================================
       if (filterType && filterValue && filterValue.trim() !== "") {
         let query: Query = this.collection.where(
@@ -175,10 +176,17 @@ export class UserRepository extends FirestoreBaseService {
           "==",
           filterValue.trim()
         );
+        // .orderBy("nome");
 
-        // Aplica filtro de pagamento, se houver
         if (typeof pagamentoEfetuado === "boolean") {
           query = query.where("pagamentoEfetuado", "==", pagamentoEfetuado);
+        }
+
+        if (startAfter) {
+          const lastDoc = await this.collection.doc(startAfter).get();
+          if (lastDoc.exists) {
+            query = query.startAfter(lastDoc);
+          }
         }
 
         const snapshot = await query.limit(limit).get();
@@ -186,16 +194,12 @@ export class UserRepository extends FirestoreBaseService {
       }
 
       // ===================================================================
-      // LÓGICA 2: BUSCA GERAL POR TEXTO ('search')
-      // Executa somente se não houver filtro avançado.
+      // LÓGICA 2: BUSCA GERAL POR TEXTO (search)
       // ===================================================================
       const searchTerm = search?.trim();
       if (searchTerm) {
         // 2.1 Busca por Email exato
         if (isEmail(searchTerm)) {
-          // Nota: Firestore não permite aplicar outros filtros (como pagamento)
-          // em buscas de igualdade simples com `getByEmail`.
-          // Se precisar combinar, a query teria que ser reescrita.
           const user = await this.getByEmail(searchTerm);
           return user ? [user] : [];
         }
@@ -211,7 +215,6 @@ export class UserRepository extends FirestoreBaseService {
         const endTerm = searchTerm + "\uf8ff";
         let baseQuery: Query = this.collection;
 
-        // Aplica filtro de pagamento, se houver
         if (typeof pagamentoEfetuado === "boolean") {
           baseQuery = baseQuery.where(
             "pagamentoEfetuado",
@@ -220,21 +223,35 @@ export class UserRepository extends FirestoreBaseService {
           );
         }
 
-        // Query para NOME
-        const queryNome = baseQuery
+        // Query por NOME
+        let queryNome = baseQuery
           .orderBy("nome")
           .startAt(searchTerm)
           .endAt(endTerm);
 
-        // Query para SOBRENOME
-        const querySobrenome = baseQuery
+        if (startAfter) {
+          const lastDoc = await this.collection.doc(startAfter).get();
+          if (lastDoc.exists) {
+            queryNome = queryNome.startAfter(lastDoc);
+          }
+        }
+
+        // Query por SOBRENOME
+        let querySobrenome = baseQuery
           .orderBy("sobrenome")
           .startAt(searchTerm)
           .endAt(endTerm);
 
+        if (startAfter) {
+          const lastDoc = await this.collection.doc(startAfter).get();
+          if (lastDoc.exists) {
+            querySobrenome = querySobrenome.startAfter(lastDoc);
+          }
+        }
+
         const [snapshotNome, snapshotSobrenome] = await Promise.all([
-          queryNome.get(),
-          querySobrenome.get(),
+          queryNome.limit(limit).get(),
+          querySobrenome.limit(limit).get(),
         ]);
 
         const usersMap = new Map<string, User>();
@@ -254,13 +271,19 @@ export class UserRepository extends FirestoreBaseService {
       }
 
       // ===================================================================
-      // LÓGICA 3: LISTAGEM SIMPLES (FALLBACK)
-      // Se não há filtro avançado nem busca geral.
+      // LÓGICA 3: LISTAGEM SIMPLES (fallback)
       // ===================================================================
       let query: Query = this.collection.orderBy("nome");
 
       if (typeof pagamentoEfetuado === "boolean") {
         query = query.where("pagamentoEfetuado", "==", pagamentoEfetuado);
+      }
+
+      if (startAfter) {
+        const lastDoc = await this.collection.doc(startAfter).get();
+        if (lastDoc.exists) {
+          query = query.startAfter(lastDoc);
+        }
       }
 
       const snapshot = await query.limit(limit).get();

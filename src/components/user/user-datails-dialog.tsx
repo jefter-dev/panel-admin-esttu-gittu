@@ -6,12 +6,26 @@ import { Eye, IdCard } from "lucide-react";
 import { UserDetailsRow } from "@/components/user/user-datails-row";
 import { useUserDetails } from "@/hooks/user/use-user-details";
 import { DialogTitle } from "@radix-ui/react-dialog";
+import * as React from "react";
+import { UserDetailsSkeleton } from "@/components/user/user-details-row-skeleton";
+import { UserNotFound } from "@/components/user/user-not-found";
 
 export function UserDetailsDialog({ userId }: { userId: string }) {
-  const { userDetails, isLoading } = useUserDetails(userId);
+  const [open, setOpen] = React.useState(false);
+  const [fetchDetails, setFetchDetails] = React.useState(false);
+
+  const { userDetails, isLoading } = useUserDetails(
+    fetchDetails ? userId : null
+  );
 
   return (
-    <Dialog>
+    <Dialog
+      open={open}
+      onOpenChange={(value) => {
+        setOpen(value);
+        if (value) setFetchDetails(true);
+      }}
+    >
       <DialogTrigger asChild>
         <Button
           variant="ghost"
@@ -25,12 +39,13 @@ export function UserDetailsDialog({ userId }: { userId: string }) {
         <DialogTitle className="flex text-xl gap-2">
           <IdCard size={32} /> Detalhes do usuário
         </DialogTitle>
+
         {isLoading ? (
-          <p>Carregando...</p>
+          <UserDetailsSkeleton />
         ) : userDetails ? (
           <UserDetailsRow user={userDetails} />
         ) : (
-          <p className="text-muted-foreground">Usuário não encontrado</p>
+          <UserNotFound />
         )}
       </DialogContent>
     </Dialog>

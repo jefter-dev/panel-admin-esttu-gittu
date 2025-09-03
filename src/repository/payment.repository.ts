@@ -1,8 +1,8 @@
 import { Timestamp, type Firestore } from "firebase-admin/firestore";
 import { FirestoreBaseService } from "@/service/firebase/firestore-base.service";
 import { DataPersistenceError } from "@/errors/custom.errors";
-import { Payment, PaymentCreatePayload } from "@/types/payment";
-import { APP } from "@/types/app";
+import { Payment, PaymentCreatePayload } from "@/types/payment.type";
+import { APP } from "@/types/app.type";
 import { getStartAndEndOfMonthUTC } from "@/lib/utils";
 
 export class PaymentRepository extends FirestoreBaseService {
@@ -46,17 +46,15 @@ export class PaymentRepository extends FirestoreBaseService {
     }
   }
 
-  async find(
-    app: APP,
-    options: {
-      limit?: number;
-      startAfter?: string;
-      search?: string;
-      dateFrom: string;
-      dateTo: string;
-    }
-  ): Promise<Payment[]> {
-    const { limit = 20, startAfter, search, dateFrom, dateTo } = options;
+  async find(options: {
+    limit?: number;
+    startAfter?: string;
+    search?: string;
+    dateFrom: string;
+    dateTo: string;
+    app: APP;
+  }): Promise<Payment[]> {
+    const { limit = 20, startAfter, search, dateFrom, dateTo, app } = options;
 
     const fromDate = new Date(dateFrom);
     fromDate.setUTCHours(0, 0, 0, 0);
@@ -69,21 +67,22 @@ export class PaymentRepository extends FirestoreBaseService {
     let snapshots: FirebaseFirestore.QueryDocumentSnapshot[] = [];
 
     if (search && search.trim() !== "") {
+      // Busca parcial por nome ou CPF
       let queryByName = this.collection
-        .orderBy("paymentDate", "asc")
         .where("app", "==", app)
-        .where("customerName", ">=", search)
-        .where("customerName", "<=", search + "\uf8ff")
         .where("paymentDate", ">=", from)
-        .where("paymentDate", "<=", to);
+        .where("paymentDate", "<=", to)
+        .orderBy("customerName")
+        .startAt(search)
+        .endAt(search + "\uf8ff");
 
       let queryByCpf = this.collection
-        .orderBy("paymentDate", "asc")
         .where("app", "==", app)
-        .where("customerCpf", ">=", search)
-        .where("customerCpf", "<=", search + "\uf8ff")
         .where("paymentDate", ">=", from)
-        .where("paymentDate", "<=", to);
+        .where("paymentDate", "<=", to)
+        .orderBy("customerCpf")
+        .startAt(search)
+        .endAt(search + "\uf8ff");
 
       if (startAfter) {
         const lastDocSnapshot = await this.collection.doc(startAfter).get();
@@ -101,24 +100,30 @@ export class PaymentRepository extends FirestoreBaseService {
       snapshots = [...snapshotByName.docs, ...snapshotByCpf.docs];
     } else {
       let query = this.collection
-        .orderBy("paymentDate", "asc")
+        .where("app", "==", app)
         .where("paymentDate", ">=", from)
-        .where("paymentDate", "<=", to);
+        .where("paymentDate", "<=", to)
+        .orderBy("paymentDate", "desc");
 
       if (startAfter) {
         const lastDocSnapshot = await this.collection.doc(startAfter).get();
-        if (lastDocSnapshot.exists) query = query.startAfter(lastDocSnapshot);
+        if (lastDocSnapshot.exists) {
+          query = query.startAfter(lastDocSnapshot);
+        }
       }
 
       const snapshot = await query.limit(limit).get();
       snapshots = snapshot.docs;
     }
 
-    // Remove duplicados
+    // Remove duplicados e adiciona idDocument no retorno
     const uniqueDocsMap = new Map(snapshots.map((doc) => [doc.id, doc]));
 
     return Array.from(uniqueDocsMap.values())
-      .map((doc) => this.mapDocTo<Payment>(doc))
+      .map((doc) => ({
+        ...this.mapDocTo<Payment>(doc),
+        idDocument: doc.id,
+      }))
       .slice(0, limit);
   }
 
@@ -197,7 +202,7 @@ export class PaymentRepository extends FirestoreBaseService {
         .where("app", "==", app)
         .where("paymentDate", ">=", fromTimestamp)
         .where("paymentDate", "<=", toTimestamp)
-        .orderBy("paymentDate", "asc");
+        .orderBy("paymentDate", "desc");
 
       // Busca os dados
       const snapshot = await query.get();
@@ -250,6 +255,74 @@ export class PaymentRepository extends FirestoreBaseService {
     }
   }
 
+  async getPaymentsByDateRange(
+    app: APP,
+    dateFrom: string,
+    dateTo: string
+  ): Promise<{ date: string; total: number }[]> {
+    try {
+      const fromDate = new Date(dateFrom);
+      fromDate.setUTCHours(0, 0, 0, 0);
+
+      const toDate = new Date(dateTo);
+      toDate.setUTCHours(23, 59, 59, 999);
+
+      const fromTimestamp = Timestamp.fromDate(fromDate);
+      const toTimestamp = Timestamp.fromDate(toDate);
+
+      const query = this.collection
+        .where("app", "==", app)
+        .where("paymentDate", ">=", fromTimestamp)
+        .where("paymentDate", "<=", toTimestamp)
+        .orderBy("paymentDate", "desc");
+
+      const snapshot = await query.get();
+
+      if (snapshot.empty) return [];
+
+      // Agrupa por dia (quantidade de pagamentos)
+      const paymentsByDay = new Map<string, number>();
+
+      snapshot.docs.forEach((doc) => {
+        const payment = this.mapDocTo<Payment>(doc);
+
+        let dateObj: Date;
+
+        if (payment.paymentDate instanceof Timestamp) {
+          dateObj = payment.paymentDate.toDate();
+        } else if (typeof payment.paymentDate === "string") {
+          dateObj = new Date(payment.paymentDate);
+        } else {
+          console.warn(
+            "[getPaymentsByDateRange] paymentDate inválido:",
+            payment.paymentDate
+          );
+          return;
+        }
+
+        const dayKey = `${dateObj.getUTCFullYear()}-${(
+          dateObj.getUTCMonth() + 1
+        )
+          .toString()
+          .padStart(2, "0")}-${dateObj
+          .getUTCDate()
+          .toString()
+          .padStart(2, "0")}`;
+
+        paymentsByDay.set(dayKey, (paymentsByDay.get(dayKey) || 0) + 1);
+      });
+
+      return Array.from(paymentsByDay.entries())
+        .map(([date, total]) => ({ date, total }))
+        .sort((a, b) => a.date.localeCompare(b.date));
+    } catch (error) {
+      console.error("[PaymentRepository.getPaymentsByDateRange] Erro:", error);
+      throw new DataPersistenceError(
+        "Falha ao buscar pagamentos no intervalo."
+      );
+    }
+  }
+
   /**
    * Retorna a quantidade de pagamentos e o valor total (amount) realizados no dia atual.
    * @param app O identificador da aplicação (multi-tenant).
@@ -294,6 +367,42 @@ export class PaymentRepository extends FirestoreBaseService {
         error
       );
       throw new DataPersistenceError("Falha ao calcular pagamentos do dia.");
+    }
+  }
+
+  /**
+   * Retorna a lista de pagamentos realizados no dia atual.
+   * @param app O identificador da aplicação (multi-tenant).
+   * @returns Array de objetos Payment.
+   */
+  async getPaymentsToday(app: APP): Promise<Payment[]> {
+    try {
+      const today = new Date();
+      const startOfDay = new Date(today);
+      startOfDay.setUTCHours(0, 0, 0, 0);
+
+      const endOfDay = new Date(today);
+      endOfDay.setUTCHours(23, 59, 59, 999);
+
+      const fromTimestamp = Timestamp.fromDate(startOfDay);
+      const toTimestamp = Timestamp.fromDate(endOfDay);
+
+      const snapshot = await this.collection
+        .where("app", "==", app)
+        .where("paymentDate", ">=", fromTimestamp)
+        .where("paymentDate", "<=", toTimestamp)
+        .orderBy("paymentDate", "desc")
+        .get();
+
+      if (snapshot.empty) return [];
+
+      return snapshot.docs.map((doc) => this.mapDocTo<Payment>(doc));
+    } catch (error) {
+      console.error(
+        "[PaymentRepository.getPaymentsToday] Erro ao buscar pagamentos do dia:",
+        error
+      );
+      throw new DataPersistenceError("Falha ao buscar pagamentos do dia.");
     }
   }
 

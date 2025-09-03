@@ -1,11 +1,11 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import type { User } from "@/types/user";
+import type { User } from "@/types/user.type";
 import { apiClient } from "@/lib/http-client";
 import { toast } from "sonner";
 import { isAxiosError } from "axios";
-import { FilterPayment, FilterType } from "@/types/filters-user";
+import { FilterPayment, FilterType } from "@/types/filters-user.type";
 
 const QUANTITY_INITIAL_PAGE_SIZE = 10;
 
@@ -64,8 +64,6 @@ export function usePaginatedUsers() {
           params.filterValue = filterValueTrimmed;
         }
 
-        console.log("params:", params);
-
         const response = await apiClient.get<{
           users: User[];
           hasNextPage: boolean;
@@ -81,7 +79,7 @@ export function usePaginatedUsers() {
 
         if (newHasNextPage && fetchedUsers.length > 0) {
           const lastUser = fetchedUsers[fetchedUsers.length - 1];
-          pageCursorsRef.current[page] = lastUser.nome; // cursor pelo nome
+          pageCursorsRef.current[page] = lastUser.idDocument;
         }
       } catch (error) {
         console.error("Erro ao buscar usuários:", error);

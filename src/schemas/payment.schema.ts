@@ -1,4 +1,4 @@
-import { APP_VALUES } from "@/types/app";
+import { APP_VALUES } from "@/types/app.type";
 import { z } from "zod";
 
 // Métodos de pagamento permitidos

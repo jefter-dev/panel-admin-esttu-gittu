@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 
-import { Admin, Role } from "@/types/admin";
+import { Admin, Role } from "@/types/admin.type";
 import {
   adminCreateSchema,
   adminUpdateSchema,

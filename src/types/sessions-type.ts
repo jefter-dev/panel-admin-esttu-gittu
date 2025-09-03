@@ -1,6 +1,6 @@
 import type { JWTPayload } from "jose";
-import { Role } from "@/types/admin";
-import { APP } from "@/types/app";
+import { Role } from "@/types/admin.type";
+import { APP } from "@/types/app.type";
 
 export interface SessionPayload extends JWTPayload {
   id: string;

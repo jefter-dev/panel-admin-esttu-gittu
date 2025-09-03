@@ -6,7 +6,7 @@
  * update, and clear tokens securely, with support for environment-specific cookie
  * configurations (e.g., secure and sameSite settings for production).
  */
-import { Tokens } from "@/types/sessions";
+import { Tokens } from "@/types/sessions-type";
 import Cookies from "js-cookie";
 
 interface CookieOptions {

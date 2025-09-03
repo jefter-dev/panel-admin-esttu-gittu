@@ -130,9 +130,12 @@ import { userCreateSchema } from "@/schemas/user.schema";
 import { handleRouteError } from "@/lib/handle-errors-utils";
 import { isValidAppName } from "@/lib/auth/session";
 import { AuthenticationError, ValidationError } from "@/errors/custom.errors";
-import { APP } from "@/types/app";
+import { APP } from "@/types/app.type";
 import { UserService } from "@/service/user.service";
-import { ALLOWED_FILTER_TYPES, AllowedFilterType } from "@/types/filters-user";
+import {
+  ALLOWED_FILTER_TYPES,
+  AllowedFilterType,
+} from "@/types/filters-user.type";
 
 export async function GET(request: NextRequest) {
   try {
@@ -173,17 +176,17 @@ export async function GET(request: NextRequest) {
     const queryLimit = limit + 1;
 
     const userService = new UserService(appDataBase);
-    const usersWithExtra = await userService.list({
+    const usersFind = await userService.list({
       limit: queryLimit,
-      startAfterName: startAfter,
+      startAfter: startAfter,
       pagamentoEfetuado: pagamentoEfetuado,
       search: search,
       filterType: filterType, // Passa o tipo validado
       filterValue: filterValue, // Passa o valor
     });
 
-    const hasNextPage = usersWithExtra.length > limit;
-    const users = hasNextPage ? usersWithExtra.slice(0, limit) : usersWithExtra;
+    const hasNextPage = usersFind.length > limit;
+    const users = hasNextPage ? usersFind.slice(0, limit) : usersFind;
 
     return NextResponse.json({ users, hasNextPage }, { status: 200 });
   } catch (error) {

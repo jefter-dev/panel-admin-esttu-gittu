@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { PaymentService } from "@/service/payment.service";
-import { APP } from "@/types/app";
+import { APP } from "@/types/app.type";
 import { AuthService } from "@/service/auth/auth.service";
 import { AuthenticationError, ValidationError } from "@/errors/custom.errors";
 import { isValidAppName } from "@/lib/auth/session";
@@ -16,15 +16,15 @@ export async function GET(request: Request) {
       throw new AuthenticationError("Sessão inválida ou token expirado.");
     }
 
-    const appDataBase: APP = session.app;
-    if (!isValidAppName(appDataBase)) {
+    const appSession: APP = session.app;
+    if (!isValidAppName(appSession)) {
       throw new ValidationError(
         "Sessão não foi encontrada ou foi mal definida."
       );
     }
 
     const service = new PaymentService(APP_DATABASE_ADMIN);
-    const stats = await service.getPaymentsSummaryToday(appDataBase);
+    const stats = await service.getPaymentsSummaryToday(appSession);
 
     return NextResponse.json({ stats }, { status: 200 });
   } catch (error) {

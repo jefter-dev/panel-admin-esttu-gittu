@@ -97,6 +97,7 @@ export function useUserForm({ userId }: UseUserFormProps) {
       documentMatricula: userDetails.documentMatricula ?? "",
       documentoComFoto: userDetails.documentoComFoto ?? "",
       fotoIdentificacao: userDetails.fotoIdentificacao ?? "",
+      pagamentoEfetuado: userDetails.pagamentoEfetuado ?? false,
     });
   }, [userDetails, form]);
 

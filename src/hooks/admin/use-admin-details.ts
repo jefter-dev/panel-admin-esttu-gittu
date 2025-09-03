@@ -3,8 +3,8 @@
 import { useState, useEffect } from "react";
 import { isAxiosError } from "axios";
 import { toast } from "sonner";
-import { SessionPayload } from "@/types/sessions";
-import { Admin } from "@/types/admin";
+import { SessionPayload } from "@/types/sessions-type";
+import { Admin } from "@/types/admin.type";
 import { apiClient } from "@/lib/http-client";
 
 export function useAdminDetails(session: SessionPayload | null) {

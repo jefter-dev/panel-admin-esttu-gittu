@@ -10,12 +10,12 @@ export function Header() {
   const title = getPageTitle(pathname);
 
   return (
-    <header className="bg-card border-b border-border px-6 pb-[10px] h-auto sm:h-16 flex flex-col sm:flex-row flex-shrink-0 sm:items-center sm:justify-between gap-2">
+    <header className="bg-card border-b border-border h-[68px] pt-[13px] pl-[70px] pr-[10px] sm:h-16 sm:pt-0 sm:pl-6 sm:flex-row flex flex-col flex-shrink-0 sm:items-center sm:justify-between gap-2">
       {/* Title + dropdown (mobile only) */}
       <div className="flex items-center justify-between w-full sm:w-auto">
         <h2
           data-cy="page-title"
-          className="text-2xl font-bold text-card-foreground"
+          className="text-lg md:text-2xl font-bold text-card-foreground"
         >
           {title}
         </h2>

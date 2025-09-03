@@ -6,7 +6,7 @@ export const getApiDocs = async (): Promise<Record<string, unknown>> => {
     definition: {
       openapi: "3.0.0",
       info: {
-        title: "Next Swagger - Panel admin esttu|gittu",
+        title: "Next Swagger - Panel admin esttu | gittu",
         version: "1.0",
       },
       components: {

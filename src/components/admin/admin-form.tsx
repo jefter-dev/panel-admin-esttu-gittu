@@ -22,8 +22,8 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 
-import { Role } from "@/types/admin";
-import { APP } from "@/types/app";
+import { Role } from "@/types/admin.type";
+import { APP } from "@/types/app.type";
 import { useAdminForm } from "@/hooks/admin/use-admin-form";
 import { AdminCreateInput, AdminUpdateInput } from "@/schemas/admin.schema";
 
@@ -47,11 +47,12 @@ export function AdminForm({ adminId }: AdminFormProps) {
 
   return (
     <>
-      <h1 className="mb-6 flex items-center gap-4 text-2xl font-bold">
-        {adminId
-          ? `Editar Admin: ${adminDetails?.name ?? ""}`
-          : "Criar Novo Admin"}
-      </h1>
+      {adminId && (
+        <h1 className="mb-6 flex items-center gap-4 text-2xl font-bold">
+          Editar administrador: {adminDetails?.name ?? ""}
+        </h1>
+      )}
+
       <Form<AdminCreateInput | AdminUpdateInput> {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}

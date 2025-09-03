@@ -3,7 +3,7 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { ChevronRight } from "lucide-react";
 
-import { User } from "@/types/user";
+import { User } from "@/types/user.type";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";

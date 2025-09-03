@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import axios, { isAxiosError } from "axios";
 import { toast } from "sonner";
-import { User } from "@/types/user";
+import { User } from "@/types/user.type";
 import { useSession } from "@/context/session-context";
 
 export function useUserProfile() {

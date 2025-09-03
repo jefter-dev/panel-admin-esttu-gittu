@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import { Payment } from "@/types/payment";
+import { Payment } from "@/types/payment.type";
 import { apiClient } from "@/lib/http-client";
 import { toast } from "sonner";
 import { isAxiosError } from "axios";
@@ -12,7 +12,7 @@ const QUANTITY_INITIAL_PAGE_SIZE = 10;
 
 interface Filters {
   search?: string;
-  dateRange: DateRange; // sempre obrigatório
+  dateRange: DateRange;
 }
 
 export function usePaginatedPayments() {
@@ -63,7 +63,7 @@ export function usePaginatedPayments() {
 
         if (newHasNextPage && fetchedPayments.length > 0) {
           const lastPayment = fetchedPayments[fetchedPayments.length - 1];
-          pageCursorsRef.current[page] = lastPayment.id; // atualiza ref
+          pageCursorsRef.current[page] = lastPayment.id;
         }
       } catch (error) {
         console.error("Erro ao buscar pagamentos:", error);

@@ -8,9 +8,10 @@ import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { PersonalDataSection } from "@/components/user/section-forms/user-form-section-personal-data";
-import { AcademicInfoSection } from "@/components/user/section-forms/academic-info-section";
+import { AcademicInfoSection } from "@/components/user/section-forms/user-form-academic-info-section";
 import { AddressSection } from "@/components/user/section-forms/user-form-address-section";
 import { useUserForm } from "@/hooks/user/use-user-form";
+import { UserFormPaymentSection } from "@/components/user/section-forms/user-form-payment-section";
 
 interface UserFormProps {
   userId: string;
@@ -76,6 +77,10 @@ export function UserForm({ userId }: UserFormProps) {
               isDisabled={isFormDisabled}
             />
             <AcademicInfoSection
+              control={form.control}
+              isDisabled={isFormDisabled}
+            />
+            <UserFormPaymentSection
               control={form.control}
               isDisabled={isFormDisabled}
             />

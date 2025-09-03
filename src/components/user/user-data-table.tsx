@@ -18,10 +18,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import type { User } from "@/types/user";
+import type { User } from "@/types/user.type";
 import { UserDetailsRow } from "@/components/user/user-datails-row";
 import { columns } from "@/components/user/user-columns";
-import { FilterPayment, FilterType, FilterValue } from "@/types/filters-user";
+import {
+  FilterPayment,
+  FilterType,
+  FilterValue,
+} from "@/types/filters-user.type";
 import { DataTableToolbar } from "@/components/user/user-data-table-toolbar";
 import { DataTablePagination } from "@/components/data-table-pagination";
 
@@ -72,78 +76,80 @@ export function UserDataTable({
   });
 
   return (
-    <div className="overflow-x-auto">
-      <div className="w-full min-w-max space-y-4">
-        <DataTableToolbar
-          table={table}
-          search={search}
-          filterPagamento={filterPagamento}
-          onFilterChange={onFilterChange}
-        />
-        <div className="rounded-md border overflow-x-auto">
-          <Table>
-            <TableHeader>
-              {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => {
-                    return (
-                      <TableHead key={header.id}>
-                        {header.isPlaceholder
-                          ? null
-                          : flexRender(
-                              header.column.columnDef.header,
-                              header.getContext()
+    <>
+      <DataTableToolbar
+        table={table}
+        search={search}
+        filterPagamento={filterPagamento}
+        onFilterChange={onFilterChange}
+      />
+      <div className="overflow-x-auto">
+        <div className="w-full min-w-max space-y-4">
+          <div className="rounded-md border overflow-x-auto">
+            <Table>
+              <TableHeader>
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <TableRow key={headerGroup.id}>
+                    {headerGroup.headers.map((header) => {
+                      return (
+                        <TableHead key={header.id}>
+                          {header.isPlaceholder
+                            ? null
+                            : flexRender(
+                                header.column.columnDef.header,
+                                header.getContext()
+                              )}
+                        </TableHead>
+                      );
+                    })}
+                  </TableRow>
+                ))}
+              </TableHeader>
+              <TableBody>
+                {table.getRowModel().rows?.length ? (
+                  table.getRowModel().rows.map((row) => (
+                    <React.Fragment key={row.id}>
+                      <TableRow data-state={row.getIsSelected() && "selected"}>
+                        {row.getVisibleCells().map((cell) => (
+                          <TableCell key={cell.id}>
+                            {flexRender(
+                              cell.column.columnDef.cell,
+                              cell.getContext()
                             )}
-                      </TableHead>
-                    );
-                  })}
-                </TableRow>
-              ))}
-            </TableHeader>
-            <TableBody>
-              {table.getRowModel().rows?.length ? (
-                table.getRowModel().rows.map((row) => (
-                  <React.Fragment key={row.id}>
-                    <TableRow data-state={row.getIsSelected() && "selected"}>
-                      {row.getVisibleCells().map((cell) => (
-                        <TableCell key={cell.id}>
-                          {flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext()
-                          )}
-                        </TableCell>
-                      ))}
-                    </TableRow>
-                    {row.getIsExpanded() && (
-                      <TableRow>
-                        <TableCell colSpan={columns.length}>
-                          <UserDetailsRow user={row.original} />
-                        </TableCell>
+                          </TableCell>
+                        ))}
                       </TableRow>
-                    )}
-                  </React.Fragment>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell
-                    colSpan={columns.length}
-                    className="h-24 text-center"
-                  >
-                    Nenhum resultado encontrado.
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
+                      {row.getIsExpanded() && (
+                        <TableRow>
+                          <TableCell colSpan={columns.length}>
+                            <UserDetailsRow user={row.original} />
+                          </TableCell>
+                        </TableRow>
+                      )}
+                    </React.Fragment>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell
+                      colSpan={columns.length}
+                      className="h-24 text-center"
+                    >
+                      Nenhum resultado encontrado.
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </div>
+          <DataTablePagination
+            page={page}
+            pageSize={pageSize}
+            hasNextPage={hasNextPage}
+            onPageChange={onPageChange}
+            onPageSizeChange={onPageSizeChange}
+          />
         </div>
-        <DataTablePagination
-          page={page}
-          pageSize={pageSize}
-          hasNextPage={hasNextPage}
-          onPageChange={onPageChange}
-          onPageSizeChange={onPageSizeChange}
-        />
       </div>
-    </div>
+    </>
   );
 }

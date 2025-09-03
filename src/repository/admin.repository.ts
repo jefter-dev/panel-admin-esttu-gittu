@@ -3,7 +3,11 @@
 import { v4 as uuidv4 } from "uuid";
 import { FirestoreBaseService } from "@/service/firebase/firestore-base.service";
 import type { Firestore } from "firebase-admin/firestore";
-import { Admin, AdminCreatePayload, AdminUpdatePayload } from "@/types/admin";
+import {
+  Admin,
+  AdminCreatePayload,
+  AdminUpdatePayload,
+} from "@/types/admin.type";
 import {
   DataPersistenceError,
   RecordNotFoundError,

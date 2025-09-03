@@ -4,7 +4,7 @@
 import { useState, useEffect } from "react";
 import { isAxiosError } from "axios";
 import { toast } from "sonner";
-import { User } from "@/types/user";
+import { User } from "@/types/user.type";
 import { apiClient } from "@/lib/http-client";
 
 // A assinatura agora aceita um ID de usuário (string), que pode ser nulo ou indefinido.

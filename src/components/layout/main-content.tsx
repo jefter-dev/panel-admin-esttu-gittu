@@ -5,7 +5,7 @@ export function MainContent({
 }) {
   return (
     <main
-      className="flex-grow overflow-y-auto bg-background"
+      className="flex-grow overflow-y-auto bg-background w-[100vw] md:w-auto"
       data-cy="main-content-area"
     >
       {children}

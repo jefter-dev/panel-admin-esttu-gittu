@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { NavigationItem } from "@/types/navigation";
+import { NavigationItem } from "@/types/navigation.type";
 import { SECONDARY_NAV_ITEMS } from "@/lib/navigation";
 
 interface SecondarySidebarProps {

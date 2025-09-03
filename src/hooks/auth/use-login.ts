@@ -6,7 +6,7 @@ import axios, { isAxiosError } from "axios";
 import { toast } from "sonner";
 import { z } from "zod";
 import { loginSchema } from "@/schemas/login.schema";
-import { Tokens } from "@/types/sessions";
+import { Tokens } from "@/types/sessions-type";
 import { SessionAdapter } from "@/lib/session-adapter";
 
 type LoginFormData = z.infer<typeof loginSchema>;

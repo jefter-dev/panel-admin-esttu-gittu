@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { AuthService } from "@/service/auth/auth.service";
-import { APP, APP_VALUES } from "@/types/app";
+import { APP, APP_VALUES } from "@/types/app.type";
 
 export async function getSessionFromRequest(request: NextRequest) {
   const authHeader = request.headers.get("Authorization");

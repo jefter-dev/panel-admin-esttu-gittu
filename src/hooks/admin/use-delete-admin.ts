@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import { apiClient } from "@/lib/http-client";
-import { Admin } from "@/types/admin";
+import { Admin } from "@/types/admin.type";
 import { isAxiosError } from "axios";
 
 export function useDeleteAdmin() {

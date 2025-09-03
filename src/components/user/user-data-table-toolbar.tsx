@@ -16,7 +16,7 @@ import {
   FilterPayment,
   FilterType,
   FilterValue,
-} from "@/types/filters-user";
+} from "@/types/filters-user.type";
 
 interface DataTableToolbarProps<TData> {
   table: TanstackTable<TData>;
@@ -150,7 +150,7 @@ export function DataTableToolbar<TData>({
             <Search className="mr-2 h-4 w-4" />
             Pesquisar
           </Button>
-
+          {/* 
           <Button
             variant="outline"
             className="w-full lg:w-auto cursor-pointer"
@@ -158,7 +158,7 @@ export function DataTableToolbar<TData>({
           >
             <SearchX className="mr-2 h-4 w-4" />
             Limpar
-          </Button>
+          </Button> */}
         </div>
       </div>
     </div>

@@ -11,7 +11,6 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 
-// Props que o componente da seção receberá
 interface PersonalDataSectionProps {
   control: Control<UserUpdateInput>;
   isDisabled: boolean;
@@ -130,6 +129,7 @@ export function PersonalDataSection({
                   type="number"
                   placeholder="1234567"
                   {...field}
+                  value={field.value ?? ""}
                   disabled={isDisabled}
                 />
               </FormControl>

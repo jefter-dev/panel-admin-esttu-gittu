@@ -1,13 +1,13 @@
 import { getFirebaseAdmin } from "@/lib/firebase-admin";
-import { APP } from "@/types/app";
+import { APP } from "@/types/app.type";
 import { UserRepository } from "@/repository/user.repository";
-import { PasswordService } from "./auth/password.service";
+import { PasswordService } from "@/service/auth/password.service";
 import {
   DuplicateRecordError,
   RecordNotFoundError,
 } from "@/errors/custom.errors";
-import { User, UserCreatePayload, UserUpdatePayload } from "@/types/user";
-import { FilterType, FilterValue } from "@/types/filters-user";
+import { User, UserCreatePayload, UserUpdatePayload } from "@/types/user.type";
+import { FilterType, FilterValue } from "@/types/filters-user.type";
 
 export class UserService {
   private app: APP;
@@ -117,7 +117,7 @@ export class UserService {
 
   async list(options: {
     limit?: number;
-    startAfterName?: string;
+    startAfter?: string;
     pagamentoEfetuado?: boolean;
     search?: string;
     filterType?: FilterType; // Passa o tipo validado

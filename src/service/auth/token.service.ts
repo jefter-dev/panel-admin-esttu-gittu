@@ -1,6 +1,6 @@
 import "server-only";
 import { SignJWT, jwtVerify } from "jose";
-import { SessionPayload, Tokens } from "@/types/sessions";
+import { SessionPayload, Tokens } from "@/types/sessions-type";
 import ms, { StringValue } from "ms";
 import { ConfigurationError } from "@/errors/custom.errors";
 

@@ -10,7 +10,7 @@ import React, {
 // MUDANÇA: Não precisamos mais do 'Cookies' diretamente aqui.
 import { jwtDecode } from "jwt-decode";
 import { SessionAdapter } from "@/lib/session-adapter"; // <-- 1. Importe seu adapter
-import { SessionPayload } from "@/types/sessions";
+import { SessionPayload } from "@/types/sessions-type";
 
 // A interface do contexto permanece a mesma
 interface SessionContextType {

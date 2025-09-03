@@ -1,7 +1,7 @@
 "use client";
 
 import { usePaginatedPayments } from "@/hooks/payment/use-paginated-payments";
-import { useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { PaymentsDataTable } from "@/components/payment/payment-data-table";
 import { PaymentsDataTableSkeleton } from "@/components/payment/payment-data-table-skeleton";
 import { subDays } from "date-fns";
@@ -21,6 +21,14 @@ export default function PaymentList() {
     isLoading,
   } = usePaginatedPayments();
 
+  const [initialLoading, setInitialLoading] = useState(true);
+
+  useEffect(() => {
+    if (!isLoading) {
+      setInitialLoading(false);
+    }
+  }, [isLoading]);
+
   const onFilterChange = useCallback(
     (newFilters: { search: string; dateRange?: DateRange }) => {
       handleFilterChange({
@@ -29,22 +37,21 @@ export default function PaymentList() {
           from: subDays(new Date(), 7),
           to: new Date(),
         },
-        // define um valor padrão caso não venha
       });
     },
     [handleFilterChange]
   );
 
-  if (isLoading && payments.length === 0) {
+  if (initialLoading && isLoading) {
     return (
-      <div className="p-10">
+      <div className="p-4 md:p-10">
         <PaymentsDataTableSkeleton rowCount={10} />
       </div>
     );
   }
 
   return (
-    <div className="p-10">
+    <div className="p-4 md:p-10">
       <PaymentsDataTable
         payments={payments}
         page={page}

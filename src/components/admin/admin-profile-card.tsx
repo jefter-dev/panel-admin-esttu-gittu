@@ -12,6 +12,8 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useSession } from "@/context/session-context";
+import { AdminProfileCardSkeleton } from "@/components/admin/admin-profile-skeleton";
+import { AdminProfileError } from "@/components/admin/admin-profile-error";
 
 export function AdminProfileCard() {
   const { user: session, isLoading: isSessionLoading } = useSession();
@@ -21,23 +23,11 @@ export function AdminProfileCard() {
   const isLoading = isSessionLoading || isDetailsLoading;
 
   if (isLoading) {
-    return (
-      <div className="text-center">
-        <p className="text-foreground animate-pulse">
-          Carregando perfil do administrador...
-        </p>
-      </div>
-    );
+    return <AdminProfileCardSkeleton />;
   }
 
   if (!adminDetails) {
-    return (
-      <div className="text-center">
-        <p className="text-muted-foreground">
-          Não foi possível exibir os dados do administrador.
-        </p>
-      </div>
-    );
+    return <AdminProfileError />;
   }
 
   return (

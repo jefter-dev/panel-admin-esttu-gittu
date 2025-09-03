@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { isAxiosError } from "axios";
 import { toast } from "sonner";
 import { SessionAdapter } from "@/lib/session-adapter";
-import { Admin } from "@/types/admin";
+import { Admin } from "@/types/admin.type";
 import { apiClient } from "@/lib/http-client";
 
 export function useAdmins() {

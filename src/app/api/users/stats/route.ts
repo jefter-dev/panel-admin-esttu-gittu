@@ -3,7 +3,7 @@ import { AuthService } from "@/service/auth/auth.service";
 import { handleRouteError } from "@/lib/handle-errors-utils";
 import { isValidAppName } from "@/lib/auth/session";
 import { AuthenticationError, ValidationError } from "@/errors/custom.errors";
-import { APP } from "@/types/app";
+import { APP } from "@/types/app.type";
 import { UserService } from "@/service/user.service";
 
 export async function GET(request: NextRequest) {

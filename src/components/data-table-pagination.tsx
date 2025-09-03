@@ -59,6 +59,7 @@ export function DataTablePagination({
             size="sm"
             onClick={() => onPageChange(page - 1)}
             disabled={page <= 1}
+            className="cursor-pointer"
           >
             Anterior
           </Button>
@@ -67,6 +68,7 @@ export function DataTablePagination({
             size="sm"
             onClick={() => onPageChange(page + 1)}
             disabled={!hasNextPage}
+            className="cursor-pointer"
           >
             Próxima
           </Button>

@@ -1,11 +1,11 @@
 "use client";
 
+import { useState, useEffect, useCallback } from "react";
 import { UserDataTable } from "@/components/user/user-data-table";
 import { usePaginatedUsers } from "@/hooks/user/use-paginated-users";
 import { DataTableUsersSkeleton } from "@/components/user/user-data-table-skeleton";
 import { columns } from "@/components/user/user-columns";
-import { useCallback } from "react";
-import { FilterType } from "@/types/filters-user";
+import { FilterType } from "@/types/filters-user.type";
 
 export default function UserList() {
   const {
@@ -15,26 +15,31 @@ export default function UserList() {
     hasNextPage,
     search,
     filterPayment,
-    handleFilterChange, // Esta é a função do hook usePaginatedUsers
+    handleFilterChange,
     handlePageChange,
     handlePageSizeChange,
     isLoading,
   } = usePaginatedUsers();
 
-  // 👇 AQUI ESTÁ A CORREÇÃO 👇
-  // Esta função agora aceita todos os filtros e os repassa corretamente
+  // 🔹 Controla se é o primeiro carregamento
+  const [initialLoading, setInitialLoading] = useState(true);
+
+  useEffect(() => {
+    if (!isLoading) {
+      setInitialLoading(false);
+    }
+  }, [isLoading]);
+
   const onFilterChange = useCallback(
     (newFilters: {
       search: string;
-      pagamentoEfetuado?: boolean; // Recebe boolean
+      pagamentoEfetuado?: boolean;
       filterType?: FilterType;
       filterValue?: string;
     }) => {
-      // Chama a função do hook diretamente com os valores recebidos.
-      // O hook agora é responsável por gerenciar seu próprio estado interno.
       handleFilterChange({
         search: newFilters.search,
-        pagamentoEfetuado: newFilters.pagamentoEfetuado, // Passa o boolean diretamente
+        pagamentoEfetuado: newFilters.pagamentoEfetuado,
         filterType: newFilters.filterType,
         filterValue: newFilters.filterValue,
       });
@@ -42,16 +47,16 @@ export default function UserList() {
     [handleFilterChange]
   );
 
-  if (isLoading && users.length === 0) {
+  if (initialLoading && isLoading) {
     return (
-      <div className="p-10">
+      <div className="p-4 md:p-10">
         <DataTableUsersSkeleton columnCount={columns.length} rowCount={10} />
       </div>
     );
   }
 
   return (
-    <div className="p-10">
+    <div className="p-4 md:p-10">
       <UserDataTable
         users={users}
         page={page}
@@ -59,7 +64,7 @@ export default function UserList() {
         hasNextPage={hasNextPage}
         search={search}
         filterPagamento={filterPayment}
-        onFilterChange={onFilterChange} // Passando a função corrigida
+        onFilterChange={onFilterChange}
         onPageChange={handlePageChange}
         onPageSizeChange={handlePageSizeChange}
       />

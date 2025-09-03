@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { Copy, Download, MoreHorizontal, QrCode, UserPen } from "lucide-react";
 
-import { User } from "@/types/user";
+import { User } from "@/types/user.type";
 import {
   downloadCanvasAsPng,
   getUrlQrCode,

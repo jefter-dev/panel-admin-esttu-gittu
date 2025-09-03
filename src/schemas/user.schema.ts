@@ -21,7 +21,7 @@ export const userCreateSchema = z.object({
       message: "Formato de CPF inválido. Use XXX.XXX.XXX-XX.",
     }),
 
-  rg: z.string().min(1, "O RG é obrigatório."),
+  rg: z.string().optional().nullable(),
   dataNascimento: z
     .string()
     .refine((value) => !value || /^\d{2}\/\d{2}\/\d{4}$/.test(value), {
@@ -50,6 +50,8 @@ export const userCreateSchema = z.object({
   fotoIdentificacao: z.url("URL inválida.").optional().nullable(),
 
   senha: z.string().min(6, "A senha deve ter pelo menos 6 caracteres."),
+
+  pagamentoEfetuado: z.boolean().default(false),
 });
 
 export const userUpdateSchema = userCreateSchema

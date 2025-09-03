@@ -7,7 +7,7 @@ import { apiClient } from "@/lib/http-client";
 
 // 1. Estatísticas gerais de usuários
 export function useUserStats() {
-  const [data, setData] = useState<{
+  const [stats, setStats] = useState<{
     paymentsConfirmed: number;
     totalUsers: number;
   } | null>(null);
@@ -20,7 +20,7 @@ export function useUserStats() {
         const res = await apiClient.get<{
           stats: { paymentsConfirmed: number; totalUsers: number };
         }>("/users/stats");
-        setData(res.data.stats);
+        setStats(res.data.stats);
       } catch (err) {
         console.error(err);
         if (isAxiosError(err)) {
@@ -34,5 +34,5 @@ export function useUserStats() {
     fetchData();
   }, []);
 
-  return { data, isLoading };
+  return { stats, isLoading };
 }

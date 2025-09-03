@@ -4,7 +4,13 @@ import { usePathname } from "next/navigation";
 import { PrimarySidebar } from "@/components/layout/primary-sidebar";
 import { SecondarySidebar } from "@/components/layout/secondary-sidebar";
 import { Button } from "@/components/ui/button";
-import { Drawer, DrawerTrigger, DrawerContent } from "@/components/ui/drawer";
+import {
+  Drawer,
+  DrawerTrigger,
+  DrawerContent,
+  DrawerTitle,
+  DrawerDescription,
+} from "@/components/ui/drawer";
 import { Menu } from "lucide-react";
 import { useLogout } from "@/hooks/auth/use-logout";
 import { useEffect, useState } from "react";
@@ -81,9 +87,12 @@ export function Sidebar() {
         </DrawerTrigger>
 
         <DrawerContent
-          className="p-0  bg-gray-100 border-none shadow-xl"
+          className="p-0 bg-transparent border-none shadow-xl"
           data-cy="mobile-drawer-content"
+          area-describedby="dialog menu"
         >
+          <DrawerTitle>Menu</DrawerTitle>
+          <DrawerDescription>Menu de navegação lateral</DrawerDescription>
           <SidebarContent pathname={pathname} onLogout={logout} open={true} />
         </DrawerContent>
       </Drawer>

@@ -8,7 +8,7 @@ interface PaymentsStats {
   totalAmount: number;
 }
 
-export function usePaymentsCurrentMonth() {
+export function usePaymentsMonth() {
   const [stats, setStats] = useState<PaymentsStats>({
     count: 0,
     totalAmount: 0,

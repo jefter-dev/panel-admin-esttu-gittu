@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { MoreHorizontal, UserPen, Trash2 } from "lucide-react";
-import { Admin } from "@/types/admin";
+import { Admin } from "@/types/admin.type";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,

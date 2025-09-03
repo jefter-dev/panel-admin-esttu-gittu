@@ -1,7 +1,7 @@
 export const LOGIN_PAGE = "/";
 export const DASHBOARD_PAGE = "/dashboard";
 
-import { NavigationItem } from "@/types/navigation";
+import { NavigationItem } from "@/types/navigation.type";
 import {
   Settings,
   LayoutPanelLeft,
@@ -32,12 +32,6 @@ export const SECONDARY_NAV_ITEMS: NavigationItem[] = [
     label: "Usuários",
     href: "/users",
     icon: UserSquare,
-  },
-  {
-    id: "cards",
-    label: "Carteirinhas",
-    href: "/cards",
-    icon: IdCard,
   },
   {
     id: "payment",

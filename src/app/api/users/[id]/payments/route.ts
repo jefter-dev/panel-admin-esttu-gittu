@@ -113,7 +113,7 @@ import { AuthService } from "@/service/auth/auth.service";
 import { PaymentService } from "@/service/payment.service";
 import { handleRouteError } from "@/lib/handle-errors-utils";
 import { AuthenticationError, ValidationError } from "@/errors/custom.errors";
-import { APP } from "@/types/app";
+import { APP } from "@/types/app.type";
 import { isValidAppName } from "@/lib/auth/session";
 
 export async function GET(

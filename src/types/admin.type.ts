@@ -1,6 +1,6 @@
 // src/types/admin.ts
 
-import { APP } from "@/types/app";
+import { APP } from "@/types/app.type";
 
 export enum Role {
   USER = "user",

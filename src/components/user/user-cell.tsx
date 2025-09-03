@@ -1,7 +1,7 @@
 "use client";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { User } from "@/types/user";
+import { User } from "@/types/user.type";
 
 interface UserCellProps {
   user: User;
@@ -23,7 +23,7 @@ export const UserCell: React.FC<UserCellProps> = ({ user }) => {
       </Avatar>
       <div className="flex flex-col">
         <span className="font-medium text-foreground">
-          {user.nome} {user.sobrenome}
+          {user.nome} | {user.sobrenome}
         </span>
         <span className="text-xs text-muted-foreground">{user.email}</span>
       </div>

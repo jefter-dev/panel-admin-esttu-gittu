@@ -1,12 +1,12 @@
 import { getFirebaseAdmin } from "@/lib/firebase-admin";
 import { AdminRepository } from "@/repository/admin.repository";
-import { APP } from "@/types/app";
+import { APP } from "@/types/app.type";
 import {
   Admin,
   AdminCreatePayload,
   AdminCreationRequest,
   AdminUpdatePayload,
-} from "@/types/admin";
+} from "@/types/admin.type";
 import { PasswordService } from "@/service/auth/password.service";
 import {
   DuplicateRecordError,

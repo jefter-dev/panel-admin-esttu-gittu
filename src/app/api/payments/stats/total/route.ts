@@ -4,7 +4,7 @@ import { APP_DATABASE_ADMIN } from "@/lib/firebase-admin";
 import { handleRouteError } from "@/lib/handle-errors-utils";
 import { AuthenticationError, ValidationError } from "@/errors/custom.errors";
 import { AuthService } from "@/service/auth/auth.service";
-import { APP } from "@/types/app";
+import { APP } from "@/types/app.type";
 import { isValidAppName } from "@/lib/auth/session";
 
 export async function GET(request: NextRequest) {
@@ -16,8 +16,8 @@ export async function GET(request: NextRequest) {
       throw new AuthenticationError("Sessão inválida ou token expirado.");
     }
 
-    const appDataBase: APP = session.app;
-    if (!isValidAppName(appDataBase)) {
+    const appSession: APP = session.app;
+    if (!isValidAppName(appSession)) {
       throw new ValidationError(
         "Sessão não foi encontrada ou foi mal definida."
       );
@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
     const paymentService = new PaymentService(APP_DATABASE_ADMIN);
 
     const total = await paymentService.getTotalAmountByDateRange(
-      appDataBase,
+      appSession,
       dateFrom,
       dateTo
     );

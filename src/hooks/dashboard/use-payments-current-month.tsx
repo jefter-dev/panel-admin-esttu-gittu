@@ -1,5 +1,5 @@
 "use client";
-import { PaymentChartItem } from "@/components/dashboard/chart-area-interactive";
+import { PaymentChartItem } from "@/components/dashboard/chart-interactive-payments";
 import { apiClient } from "@/lib/http-client";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";

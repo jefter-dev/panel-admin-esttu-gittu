@@ -64,7 +64,7 @@ export function PaymentsTableToolbar({
         <Button
           variant="outline"
           onClick={clearSearch}
-          className="w-full sm:w-auto flex items-center gap-2"
+          className="w-full sm:w-auto flex items-center"
         >
           <SearchX size={14} />
           Limpar
@@ -80,7 +80,7 @@ export function PaymentsTableToolbar({
 
         <Button
           onClick={handleSearchClick}
-          className="w-full sm:w-auto flex items-center gap-2 cursor-pointer"
+          className="w-full sm:w-auto flex items-center cursor-pointer"
         >
           <Search /> Pesquisar
         </Button>

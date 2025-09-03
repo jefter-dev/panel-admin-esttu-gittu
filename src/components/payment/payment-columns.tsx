@@ -1,7 +1,7 @@
 import { ColumnDef } from "@tanstack/react-table";
-import { Payment } from "@/types/payment";
+import { Payment } from "@/types/payment.type";
 import { Badge } from "@/components/ui/badge";
-import { PaymentMethod, PaymentStatus } from "@/types/payment";
+import { PaymentMethod, PaymentStatus } from "@/types/payment.type";
 import { UserDetailsDialog } from "../user/user-datails-dialog";
 
 export const columns: ColumnDef<Payment>[] = [
@@ -15,9 +15,7 @@ export const columns: ColumnDef<Payment>[] = [
 
       return (
         <div className="flex items-center gap-2">
-          <span className="font-medium">
-            {rowIndex} - {payment.id}
-          </span>
+          <span className="font-medium">{payment.id}</span>
           <Badge variant="secondary">{gatewayPaymentId}</Badge>
         </div>
       );

@@ -15,8 +15,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Painel admin Esttu|Gittu",
-  description: "Painel admin Esttu|Gittu",
+  title: "Painel admin Esttu | Gittu",
+  description: "Painel admin Esttu | Gittu",
 };
 
 export default function RootLayout({

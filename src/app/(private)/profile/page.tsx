@@ -1,6 +1,6 @@
 "use client";
 
-import { AdminProfileCard } from "@/components/admin-profile-card";
+import { AdminProfileCard } from "@/components/admin/admin-profile-card";
 
 export default function ProfilePage() {
   return (

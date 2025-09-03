@@ -1,5 +1,5 @@
 import { ConfigurationError } from "@/errors/custom.errors";
-import { APP } from "@/types/app";
+import { APP } from "@/types/app.type";
 import admin from "firebase-admin";
 
 export const APP_DATABASE_ADMIN = "admin";

@@ -2,7 +2,7 @@ import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { apiClient } from "@/lib/http-client";
 import { PRIMARY_NAV_ITEMS, SECONDARY_NAV_ITEMS } from "@/lib/navigation";
-import { User } from "@/types/user";
+import { User } from "@/types/user.type";
 import { toast } from "sonner";
 
 export function cn(...inputs: ClassValue[]) {
@@ -163,4 +163,13 @@ export function formatCurrency(value: number) {
     style: "currency",
     currency: "BRL",
   });
+}
+
+export function parseDateAsUTC(dateString: string): Date {
+  const [datePart, timePart] = dateString.split(" ");
+  const [year, month, day] = datePart.split("-").map(Number);
+  const [hours, minutes, seconds] = timePart.split(":").map(Number);
+
+  // Obs: mês é 0-indexado no JS Date
+  return new Date(Date.UTC(year, month - 1, day, hours, minutes, seconds));
 }

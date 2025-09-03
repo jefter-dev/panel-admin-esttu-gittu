@@ -3,7 +3,7 @@ import { PaymentService } from "@/service/payment.service";
 import { AuthService } from "@/service/auth/auth.service";
 import { handleRouteError } from "@/lib/handle-errors-utils";
 import { isValidAppName } from "@/lib/auth/session";
-import { APP } from "@/types/app";
+import { APP } from "@/types/app.type";
 import { AuthenticationError, ValidationError } from "@/errors/custom.errors";
 import { APP_DATABASE_ADMIN } from "@/lib/firebase-admin";
 
@@ -16,8 +16,8 @@ export async function GET(request: NextRequest) {
       throw new AuthenticationError("Sessão inválida ou token expirado.");
     }
 
-    const appDataBase: APP = session.app;
-    if (!isValidAppName(appDataBase)) {
+    const appSession: APP = session.app;
+    if (!isValidAppName(appSession)) {
       throw new ValidationError(
         "Sessão não foi encontrada ou foi mal definida."
       );
@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
 
     const paymentService = new PaymentService(APP_DATABASE_ADMIN);
     const paymentsCurrentMonth = await paymentService.getPaymentsCurrentMonth(
-      appDataBase
+      appSession
     );
 
     return NextResponse.json(

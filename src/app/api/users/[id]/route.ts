@@ -8,7 +8,7 @@ import {
   ValidationError,
   RecordNotFoundError,
 } from "@/errors/custom.errors";
-import { APP } from "@/types/app";
+import { APP } from "@/types/app.type";
 import { isValidAppName } from "@/lib/auth/session";
 import { z } from "zod";
 

@@ -1,4 +1,4 @@
-import { User } from "@/types/user";
+import { User } from "@/types/user.type";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";

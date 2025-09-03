@@ -9,11 +9,11 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useAdmins } from "@/hooks/admin/use-admins";
-import { TableSkeletonAdmin } from "./admin-table-skeleton";
-import { Badge } from "../ui/badge";
+import { TableSkeletonAdmin } from "@/components/admin/admin-table-skeleton";
+import { Badge } from "@/components/ui/badge";
 import { formatDateTime } from "@/lib/utils";
 import { AdminTableActions } from "@/components/admin/admin-table-actions";
-import { Admin } from "@/types/admin";
+import { Admin } from "@/types/admin.type";
 
 export function AdminTable() {
   const { admins, isLoading } = useAdmins();

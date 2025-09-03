@@ -1,15 +1,13 @@
 import { NextResponse } from "next/server";
 import { PaymentService } from "@/service/payment.service";
-import { APP } from "@/types/app";
-import { AuthService } from "@/service/auth/auth.service";
-import { AuthenticationError, ValidationError } from "@/errors/custom.errors";
-import { isValidAppName } from "@/lib/auth/session";
 import { APP_DATABASE_ADMIN } from "@/lib/firebase-admin";
+import { AuthService } from "@/service/auth/auth.service";
+import { isValidAppName } from "@/lib/auth/session";
 import { handleRouteError } from "@/lib/handle-errors-utils";
+import { AuthenticationError, ValidationError } from "@/errors/custom.errors";
 
 export async function GET(request: Request) {
   try {
-    // Recupera token Bearer
     const token = request.headers.get("Authorization")?.split(" ")[1];
     const session = await AuthService.verifyToken(token);
 
@@ -17,22 +15,19 @@ export async function GET(request: Request) {
       throw new AuthenticationError("Sessão inválida ou token expirado.");
     }
 
-    const appDataBase: APP = session.app;
-    if (!isValidAppName(appDataBase)) {
+    const appSession = session.app;
+    if (!isValidAppName(appSession)) {
       throw new ValidationError(
         "Sessão não foi encontrada ou foi mal definida."
       );
     }
 
-    // Instancia o service
     const service = new PaymentService(APP_DATABASE_ADMIN);
+    const payments = await service.getPaymentsToday(appSession);
 
-    // Chama o método para o mês corrente
-    const stats = await service.getPaymentsSummaryCurrentMonth(appDataBase);
-
-    return NextResponse.json({ stats }, { status: 200 });
+    return NextResponse.json({ payments }, { status: 200 });
   } catch (error) {
-    console.error("Erro ao buscar total de pagamentos do mês:", error);
+    console.error("Erro ao buscar listagem de pagamentos do dia:", error);
     return handleRouteError(error);
   }
 }

@@ -1,5 +1,5 @@
 import { Timestamp } from "firebase-admin/firestore";
-import { APP } from "./app";
+import { APP } from "@/types/app.type";
 
 // Status possíveis de um pagamento (alinhado com o schema)
 export type PaymentStatus =
@@ -43,7 +43,7 @@ export interface Payment {
   status: PaymentStatus;
 
   /** Data/hora em que o pagamento foi confirmado no gateway (ISO 8601) */
-  paymentDate: Timestamp;
+  paymentDate: Timestamp | string;
 
   /** Timestamp de quando o registro foi criado no sistema (ISO 8601) */
   createdAt?: Timestamp;
