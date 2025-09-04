@@ -40,15 +40,17 @@ export function useUserForm({ userId }: UseUserFormProps) {
   const onSubmit = async (values: UserUpdateInput) => {
     setIsSubmitting(true);
     try {
-      await apiClient.put(`/users/${userId}`, values);
-      toast.success("User updated successfully");
+      await apiClient.patch(`/users/${userId}`, values);
+      toast.success("Usuário atualizado com sucesso");
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {
-        toast.error(error.response?.data?.message || "Failed to update user");
+        toast.error(
+          error.response?.data?.message || "Falha ao atualizar o usuário"
+        );
       } else if (error instanceof Error) {
         toast.error(error.message);
       } else {
-        toast.error("Failed to update user");
+        toast.error("Falha ao atualizar o usuário");
       }
     } finally {
       setIsSubmitting(false);

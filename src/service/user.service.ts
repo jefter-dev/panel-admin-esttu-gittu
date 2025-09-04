@@ -96,6 +96,7 @@ export class UserService {
     idDocument: string,
     payload: UserUpdatePayload
   ): Promise<void> {
+    console.log("idDocument: ", idDocument);
     const userToUpdate = await this.userRepository.findByDocumentId(idDocument);
     if (!userToUpdate) {
       throw new RecordNotFoundError("User to update not found.");
