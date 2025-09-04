@@ -1,4 +1,5 @@
 const nextConfig = {
+  output: "standalone", // não export
   images: {
     remotePatterns: [
       {

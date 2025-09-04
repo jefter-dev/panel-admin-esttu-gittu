@@ -1,0 +1,50 @@
+version: "3.8"
+
+services:
+  app:
+    image: jefterdev/admin-esttu-gittu:latest
+    networks:
+      - rede_production
+    environment:
+      # ======================
+      # 🔥 Firebase Admin
+      # ======================
+      - FIREBASE_PROJECT_ID_ADMIN=${FIREBASE_PROJECT_ID_ADMIN}
+      - FIREBASE_PRIVATE_KEY_ADMIN=${FIREBASE_PRIVATE_KEY_ADMIN}
+      - FIREBASE_CLIENT_EMAIL_ADMIN=${FIREBASE_CLIENT_EMAIL_ADMIN}
+
+      # ======================
+      # 🔥 Firebase Admin (esttu)
+      - FIREBASE_PROJECT_ID_ESTTU=${FIREBASE_PROJECT_ID_ESTTU}
+      - FIREBASE_PRIVATE_KEY_ESTTU=${FIREBASE_PRIVATE_KEY_ESTTU}
+      - FIREBASE_CLIENT_EMAIL_ESTTU=${FIREBASE_CLIENT_EMAIL_ESTTU}
+
+      # ======================
+      # 🔥 Firebase Admin (gittu)
+      - FIREBASE_PROJECT_ID_GITTU=${FIREBASE_PROJECT_ID_GITTU}
+      - FIREBASE_PRIVATE_KEY_GITTU=${FIREBASE_PRIVATE_KEY_GITTU}
+      - FIREBASE_CLIENT_EMAIL_GITTU=${FIREBASE_CLIENT_EMAIL_GITTU}
+
+      # ======================
+      # 🔑 JWT
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_ACCESS_TOKEN_EXPIRES_IN=${JWT_ACCESS_TOKEN_EXPIRES_IN}
+      - JWT_REFRESH_TOKEN_EXPIRES_IN=${JWT_REFRESH_TOKEN_EXPIRES_IN}
+
+      # ======================
+      # 💳 Asaas
+      - ASAAS_WEBHOOK_SECRET=${ASAAS_WEBHOOK_SECRET}
+
+    deploy:
+      mode: replicated
+      replicas: 1
+      labels:
+        - traefik.enable=true
+        - traefik.http.routers.admin-esttu-gittu.rule=Host(`admin.dunis.com.br`)
+        - traefik.http.routers.admin-esttu-gittu.entrypoints=websecure
+        - traefik.http.routers.admin-esttu-gittu.tls.certresolver=letsencryptresolver
+        - traefik.http.services.admin-esttu-gittu.loadbalancer.server.port=3000
+
+networks:
+  rede_production:
+    external: true
