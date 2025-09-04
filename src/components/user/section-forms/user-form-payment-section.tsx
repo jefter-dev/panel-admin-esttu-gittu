@@ -26,33 +26,41 @@ export function UserFormPaymentSection({
   control,
   isDisabled,
 }: UserFormPaymentSectionProps) {
+  if (control._formValues.pagamentoEfetuado === undefined) {
+    return null;
+  }
+
   return (
     <div className="col-span-3 space-y-4 rounded-md border p-6">
       <h2 className="text-xl font-semibold">Pagamento</h2>
+
       <FormField
         control={control}
         name="pagamentoEfetuado"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Pagamento efetuado</FormLabel>
-            <FormControl>
-              <Select
-                disabled={isDisabled}
-                value={field.value === true ? "true" : "false"}
-                onValueChange={(value) => field.onChange(value === "true")}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Selecione o status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="true">Sim</SelectItem>
-                  <SelectItem value="false">Não</SelectItem>
-                </SelectContent>
-              </Select>
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
+        render={({ field }) => {
+          const pagamentoValue = !!field.value;
+          return (
+            <FormItem>
+              <FormLabel>Pagamento efetuado</FormLabel>
+              <FormControl>
+                <Select
+                  disabled={isDisabled}
+                  value={pagamentoValue ? "true" : "false"}
+                  onValueChange={(value) => field.onChange(value === "true")}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Selecione o status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="true">Sim</SelectItem>
+                    <SelectItem value="false">Não</SelectItem>
+                  </SelectContent>
+                </Select>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          );
+        }}
       />
     </div>
   );

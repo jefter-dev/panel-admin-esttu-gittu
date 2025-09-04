@@ -29,7 +29,6 @@ export function usePaginatedUsers() {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(QUANTITY_INITIAL_PAGE_SIZE);
 
-  // ref para cursors, evita warnings do useEffect
   const pageCursorsRef = useRef<(string | null)[]>([null]);
 
   useEffect(() => {
@@ -102,7 +101,7 @@ export function usePaginatedUsers() {
     return () => {
       ignore = true;
     };
-  }, [page, pageSize, currentSearch, filterPayment, filterType, filterValue]); // não precisa do pageCursorsRef nas deps
+  }, [page, pageSize, currentSearch, filterPayment, filterType, filterValue]);
 
   const handleFilterChange = useCallback((filters: Filters) => {
     setPage(1);

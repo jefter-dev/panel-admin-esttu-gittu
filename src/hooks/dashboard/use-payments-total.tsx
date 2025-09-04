@@ -2,7 +2,6 @@ import { apiClient } from "@/lib/http-client";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
-// 4. Pagamentos em intervalo (dateFrom / dateTo)
 export function usePaymentsTotal(dateFrom: string, dateTo: string) {
   const [total, setTotal] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(false);

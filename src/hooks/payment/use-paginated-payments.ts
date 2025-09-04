@@ -29,7 +29,6 @@ export function usePaginatedPayments() {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(QUANTITY_INITIAL_PAGE_SIZE);
 
-  // Ref para controlar os cursors sem disparar o useEffect
   const pageCursorsRef = useRef<(string | null)[]>([null]);
 
   useEffect(() => {
@@ -91,7 +90,7 @@ export function usePaginatedPayments() {
     setPage(1);
     setCurrentSearch(filters.search ?? "");
     setCurrentDateRange(filters.dateRange);
-    pageCursorsRef.current = [null]; // reset cursors
+    pageCursorsRef.current = [null];
   }, []);
 
   const handlePageChange = useCallback(
@@ -107,7 +106,7 @@ export function usePaginatedPayments() {
   const handlePageSizeChange = useCallback((newPageSize: number) => {
     setPageSize(newPageSize);
     setPage(1);
-    pageCursorsRef.current = [null]; // reset cursors
+    pageCursorsRef.current = [null];
   }, []);
 
   return {

@@ -12,7 +12,6 @@ export function useLogout() {
   const submit = async () => {
     setIsLoading(true);
     try {
-      // Remove os tokens salvos nos cookies
       await SessionAdapter.clearTokens();
 
       toast.success("Logout realizado com sucesso!");

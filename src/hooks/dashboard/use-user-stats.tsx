@@ -5,7 +5,6 @@ import { isAxiosError } from "axios";
 import { toast } from "sonner";
 import { apiClient } from "@/lib/http-client";
 
-// 1. Estatísticas gerais de usuários
 export function useUserStats() {
   const [stats, setStats] = useState<{
     paymentsConfirmed: number;

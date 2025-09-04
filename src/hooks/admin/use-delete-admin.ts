@@ -15,7 +15,6 @@ export function useDeleteAdmin() {
       await apiClient.delete(`/admins/${admin.id}`);
       toast.success(`Admin ${admin.name} removido com sucesso!`);
 
-      // TODO: rever lógica
       window.location.reload();
     } catch (err) {
       if (isAxiosError(err)) {

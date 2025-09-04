@@ -1,4 +1,3 @@
-// Em: src/hooks/use-user-details.ts (ou onde o hook estiver)
 "use client";
 
 import { useState, useEffect } from "react";
@@ -7,13 +6,11 @@ import { toast } from "sonner";
 import { User } from "@/types/user.type";
 import { apiClient } from "@/lib/http-client";
 
-// A assinatura agora aceita um ID de usuário (string), que pode ser nulo ou indefinido.
 export function useUserDetails(userId: string | null | undefined) {
   const [userDetails, setUserDetails] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true); // Começa como true para o estado inicial
 
   useEffect(() => {
-    // Se não houver ID, não fazemos nada.
     if (!userId) {
       setIsLoading(false);
       return;
@@ -34,7 +31,6 @@ export function useUserDetails(userId: string | null | undefined) {
         } else {
           toast.error("Ocorreu um erro inesperado.");
         }
-        // Em caso de erro, limpamos os detalhes para evitar mostrar dados antigos.
         setUserDetails(null);
       } finally {
         setIsLoading(false);
@@ -42,7 +38,7 @@ export function useUserDetails(userId: string | null | undefined) {
     };
 
     fetchUserDetails();
-  }, [userId]); // O hook agora depende apenas do userId.
+  }, [userId]);
 
   return { userDetails, isLoading };
 }

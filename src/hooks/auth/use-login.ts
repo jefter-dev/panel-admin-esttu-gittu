@@ -18,16 +18,13 @@ export function useLogin() {
   const submit = async (data: LoginFormData) => {
     setIsLoading(true);
     try {
-      // Faz login na API e pega os tokens
       const response = await axios.post<Tokens>("/api/auth/login", data);
       const tokens = response.data;
 
-      // Salva os tokens no cookie via SessionAdapter
       await SessionAdapter.saveTokens(tokens);
 
       toast.success("Login realizado com sucesso!");
 
-      // Redireciona para o dashboard
       router.push("/dashboard");
     } catch (error) {
       if (isAxiosError(error)) {

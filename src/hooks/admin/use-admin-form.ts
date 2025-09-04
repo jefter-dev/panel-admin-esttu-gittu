@@ -17,7 +17,7 @@ import { useRouter } from "next/navigation";
 import { isAxiosError } from "axios";
 
 interface UseAdminFormProps {
-  adminId?: string; // se vier, edita; senão, cria
+  adminId?: string;
 }
 
 export function useAdminForm({ adminId }: UseAdminFormProps) {
@@ -38,7 +38,6 @@ export function useAdminForm({ adminId }: UseAdminFormProps) {
     },
   });
 
-  // ✅ busca detalhes para edição
   useEffect(() => {
     if (adminId) {
       setIsLoading(true);
@@ -50,7 +49,7 @@ export function useAdminForm({ adminId }: UseAdminFormProps) {
           form.reset({
             name: data.name,
             email: data.email,
-            password: "", // nunca trazemos senha do backend
+            password: "",
             role: data.role,
             app: data.app,
           });
@@ -60,7 +59,6 @@ export function useAdminForm({ adminId }: UseAdminFormProps) {
     }
   }, [adminId, form]);
 
-  // ✅ submit para create/update
   const onSubmit = async (values: AdminCreateInput | AdminUpdateInput) => {
     setIsSubmitting(true);
     try {
