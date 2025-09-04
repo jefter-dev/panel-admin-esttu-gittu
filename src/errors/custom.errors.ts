@@ -1,6 +1,21 @@
+/**
+ * @file errors/custom.errors.ts
+ *
+ * @summary Custom application error classes for structured error handling.
+ * Includes authentication, validation, persistence, and specific errors.
+ */
+
+/**
+ * Base class for all application errors.
+ */
 export class AppError extends Error {
+  /** HTTP status code associated with this error */
   public readonly statusCode: number;
 
+  /**
+   * @param message Human-readable error message
+   * @param statusCode HTTP status code
+   */
   constructor(message: string, statusCode: number) {
     super(message);
     this.statusCode = statusCode;
@@ -8,74 +23,103 @@ export class AppError extends Error {
   }
 }
 
-// Autenticação
+// ===================================================
+// Authentication / Authorization Errors
+// ===================================================
+
+/** Error for invalid credentials (login failures) */
 export class InvalidCredentialsError extends AppError {
-  constructor(message = "Credenciais inválidas.") {
+  constructor(message = "Invalid credentials.") {
     super(message, 401);
   }
 }
 
+/** Error for unauthorized access to a resource */
 export class UnauthorizedAccessError extends AppError {
-  constructor(message = "Você não está autorizado a acessar este recurso.") {
+  constructor(message = "You are not authorized to access this resource.") {
     super(message, 401);
   }
 }
 
+/** Error for forbidden actions due to insufficient permissions */
 export class ForbiddenActionError extends AppError {
-  constructor(message = "Você não tem permissão para realizar esta ação.") {
+  constructor(message = "You do not have permission to perform this action.") {
     super(message, 403);
   }
 }
 
+/** Error for expired authentication tokens */
 export class TokenExpiredError extends AppError {
-  constructor(message = "Token expirado. Faça login novamente.") {
+  constructor(message = "Token expired. Please login again.") {
     super(message, 401);
   }
 }
 
-// Validação
+// ===================================================
+// Validation Errors
+// ===================================================
+
+/** Error for validation failures */
 export class ValidationError extends Error {
+  /** Optional details about the validation failure */
   public details?: unknown;
+
   constructor(message: string, details?: unknown) {
     super(message);
     this.name = "ValidationError";
     this.details = details;
   }
 }
-// Persistência
+
+// ===================================================
+// Persistence / Database Errors
+// ===================================================
+
+/** Error when attempting to create a duplicate record */
 export class DuplicateRecordError extends AppError {
-  constructor(message = "Este registro já existe.") {
+  constructor(message = "This record already exists.") {
     super(message, 409);
   }
 }
 
+/** Error when a requested record is not found */
 export class RecordNotFoundError extends AppError {
-  constructor(message = "O registro solicitado não foi encontrado.") {
+  constructor(message = "The requested record was not found.") {
     super(message, 404);
   }
 }
 
+/** Error when persisting data to the database fails */
 export class DataPersistenceError extends AppError {
-  constructor(message = "Falha ao persistir os dados no banco.") {
+  constructor(message = "Failed to persist data to the database.") {
     super(message, 500);
   }
 }
 
-// Casos específicos
+// ===================================================
+// Specific Domain Errors
+// ===================================================
+
+/** Error for already used email during registration */
 export class EmailAlreadyUsedError extends AppError {
-  constructor(message = "Este e-mail já está em uso.") {
+  constructor(message = "This email is already in use.") {
     super(message, 409);
   }
 }
 
-// Erro para falhas de autenticação ou autorização.
+// ===================================================
+// Other Errors
+// ===================================================
+
+/** Generic error for authentication failures */
 export class AuthenticationError extends Error {
-  constructor(message: string = "Sessão inválida ou não autorizada.") {
+  constructor(message: string = "Invalid or unauthorized session.") {
     super(message);
     this.name = "AuthenticationError";
   }
 }
 
+/** Error for misconfiguration issues */
 export class ConfigurationError extends Error {
   constructor(message: string) {
     super(message);
@@ -83,6 +127,7 @@ export class ConfigurationError extends Error {
   }
 }
 
+/** Error for webhook handling failures */
 export class WebhookError extends Error {
   constructor(message: string) {
     super(message);

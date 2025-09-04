@@ -1,4 +1,3 @@
-// components/dashboard/payments-today-table.tsx
 "use client";
 
 import * as React from "react";

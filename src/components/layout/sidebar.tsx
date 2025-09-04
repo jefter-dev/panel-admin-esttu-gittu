@@ -15,7 +15,6 @@ import { Menu } from "lucide-react";
 import { useLogout } from "@/hooks/auth/use-logout";
 import { useEffect, useState } from "react";
 import { SECONDARY_SIDEBAR_PATHS } from "@/lib/navigation";
-// import { SECONDARY_SIDEBAR_PATHS } from '@/lib/navigation';
 
 function SidebarContent({
   pathname,

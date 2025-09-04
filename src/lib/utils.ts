@@ -1,3 +1,10 @@
+/**
+ * @file lib-utils.ts
+ *
+ * @summary Utility functions for class handling, API interactions, date/number formatting,
+ * image downloads, canvas handling, and user-related helpers.
+ */
+
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { apiClient } from "@/lib/http-client";
@@ -5,10 +12,19 @@ import { PRIMARY_NAV_ITEMS, SECONDARY_NAV_ITEMS } from "@/lib/navigation";
 import { User } from "@/types/user.type";
 import { toast } from "sonner";
 
+/**
+ * Merges and resolves Tailwind CSS class strings.
+ * Combines `clsx` and `twMerge` for conditional class merging.
+ */
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+/**
+ * Determines the best page title based on the current pathname.
+ * @param pathname Current browser pathname
+ * @returns The label of the matching navigation item or fallback "Painel"
+ */
 export const getPageTitle = (pathname: string): string => {
   let bestMatch: { label: string; hrefLength: number } | null = null;
 
@@ -28,24 +44,20 @@ export const getPageTitle = (pathname: string): string => {
   return bestMatch ? bestMatch.label : "Painel";
 };
 
+/**
+ * Downloads an image from a given URL via the API and triggers a browser download.
+ * @param url Image URL to download
+ * @param filename Desired file name for the download
+ */
 export async function handleDownloadImage(url: string, filename: string) {
   try {
-    // 2. Use apiClient.post em vez de fetch.
-    // O primeiro argumento é a URL, o segundo é o corpo da requisição.
     const response = await apiClient.post(
-      "/download-image", // A URL relativa à baseURL do seu cliente
-      { url }, // O corpo da requisição (payload)
-      {
-        // 3. Esta é a parte crucial:
-        // Dizemos ao Axios para tratar a resposta como um Blob, não como JSON.
-        responseType: "blob",
-      }
+      "/download-image",
+      { url },
+      { responseType: "blob" }
     );
 
-    // 4. Com responseType: 'blob', os dados binários estão diretamente em 'response.data'.
     const blob = response.data;
-
-    // O resto da lógica para criar o link de download permanece exatamente o mesmo.
     const blobUrl = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = blobUrl;
@@ -55,10 +67,15 @@ export async function handleDownloadImage(url: string, filename: string) {
     document.body.removeChild(link);
     URL.revokeObjectURL(blobUrl);
   } catch {
-    toast.error("Não foi possível baixar a imagem.");
+    toast.error("Failed to download the image.");
   }
 }
 
+/**
+ * Generates a URL for a user's QR code depending on their type (Esttu or other).
+ * @param user User object
+ * @returns QR code URL
+ */
 export function getUrlQrCode(user: User) {
   const isEsttu = !!user.curso;
 
@@ -85,20 +102,16 @@ export function getUrlQrCode(user: User) {
         nomePai: user.nomePai,
         tipoSanguineo: user.tipoSanguineo,
       };
+
   const baseUrl = isEsttu ? "https://esttu-ec034.web.app/#/carteirinha" : "";
-
   const userEncoded = encodeURIComponent(JSON.stringify(qrCodePayload));
-  const qrCodeUrl = isEsttu
-    ? `${baseUrl}?user=${userEncoded}`
-    : user.documentDiagnostico;
-
-  return qrCodeUrl;
+  return isEsttu ? `${baseUrl}?user=${userEncoded}` : user.documentDiagnostico;
 }
 
 /**
- * Faz o download de um elemento canvas como imagem PNG.
- * @param canvasId ID do elemento <canvas> no DOM.
- * @param filename Nome do arquivo a ser baixado (sem extensão).
+ * Downloads a <canvas> element as a PNG image.
+ * @param canvasId ID of the canvas element in the DOM
+ * @param filename Desired file name without extension
  */
 export function downloadCanvasAsPng(canvasId: string, filename: string) {
   const canvas = document.getElementById(canvasId) as HTMLCanvasElement | null;
@@ -110,29 +123,32 @@ export function downloadCanvasAsPng(canvasId: string, filename: string) {
   link.click();
 }
 
-// Funções auxiliares para identificar o tipo de busca
-export const isEmail = (term: string): boolean => {
-  // Regex simples para verificar se parece um e-mail
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(term);
-};
+/**
+ * Checks if a string resembles an email.
+ */
+export const isEmail = (term: string): boolean =>
+  /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(term);
 
+/**
+ * Validates whether a string is a valid CPF (Brazilian individual taxpayer registry).
+ */
 export const isCPF = (term: string): boolean => {
-  // Verifica se o termo, após remover a formatação, contém apenas números e tem 11 dígitos
   const cleaned = term.replace(/[.\-]/g, "");
   return /^\d{11}$/.test(cleaned);
 };
 
+/**
+ * Formats a string as a Brazilian CPF (XXX.XXX.XXX-XX).
+ */
 export const formatCPF = (cpf: string): string => {
-  // Garante que estamos trabalhando com uma string limpa de 11 dígitos
   const cleaned = cpf.replace(/\D/g, "");
-  if (cleaned.length !== 11) {
-    // Retorna o original se não for um CPF válido para formatação
-    return cpf;
-  }
-  // Aplica a máscara XXX.XXX.XXX-XX
+  if (cleaned.length !== 11) return cpf;
   return cleaned.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
 };
 
+/**
+ * Formats an ISO date string into Brazilian datetime format (dd/MM/yyyy HH:mm).
+ */
 export const formatDateTime = (iso?: string) => {
   if (!iso) return "";
   const date = new Date(iso);
@@ -145,6 +161,10 @@ export const formatDateTime = (iso?: string) => {
   }).format(date);
 };
 
+/**
+ * Returns the start and end dates of a month in UTC.
+ * @param date Optional reference date (default: today)
+ */
 export function getStartAndEndOfMonthUTC(date: Date = new Date()): {
   start: Date;
   end: Date;
@@ -158,18 +178,63 @@ export function getStartAndEndOfMonthUTC(date: Date = new Date()): {
   return { start, end };
 }
 
+/**
+ * Formats a number as Brazilian currency.
+ */
 export function formatCurrency(value: number) {
-  return value.toLocaleString("pt-BR", {
-    style: "currency",
-    currency: "BRL",
-  });
+  return value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 }
 
+/**
+ * Parses a string date as a UTC Date object.
+ * @param dateString Date string in format 'YYYY-MM-DD HH:mm:ss'
+ */
 export function parseDateAsUTC(dateString: string): Date {
   const [datePart, timePart] = dateString.split(" ");
   const [year, month, day] = datePart.split("-").map(Number);
   const [hours, minutes, seconds] = timePart.split(":").map(Number);
-
-  // Obs: mês é 0-indexado no JS Date
   return new Date(Date.UTC(year, month - 1, day, hours, minutes, seconds));
 }
+
+/**
+ * Converts a given string into a URL-friendly slug.
+ * - Removes accents and diacritics.
+ * - Replaces non-alphanumeric characters with underscores.
+ * - Converts the result to lowercase.
+ *
+ * @param text Input string to be transformed
+ * @returns Slugified version of the input string
+ */
+export const slugify = (text: string) =>
+  text
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-zA-Z0-9]/g, "_")
+    .toLowerCase();
+
+/**
+ * Fetches an image through a proxy API endpoint and converts it into a base64 string.
+ * - Uses `/api/download-image` to avoid CORS issues.
+ * - Returns `null` if the request fails.
+ *
+ * @param url Image URL to fetch
+ * @returns A base64-encoded string of the image, or `null` if failed
+ */
+export const fetchImageProxy = async (url: string): Promise<string | null> => {
+  try {
+    const res = await fetch("/api/download-image", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ url }),
+    });
+    if (!res.ok) return null;
+    const blob = await res.blob();
+    return new Promise<string>((resolve) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.readAsDataURL(blob);
+    });
+  } catch {
+    return null;
+  }
+};

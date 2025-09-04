@@ -3,51 +3,23 @@
 import { jsPDF } from "jspdf";
 import { User } from "@/types/user.type";
 import { Button } from "@/components/ui/button";
-import { formatDateTime } from "@/lib/utils";
+import { fetchImageProxy, formatDateTime, slugify } from "@/lib/utils";
 import { FileDown } from "lucide-react";
 import { toast } from "sonner";
 
-// Normaliza nome do arquivo
-const slugify = (text: string) =>
-  text
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^a-zA-Z0-9]/g, "_")
-    .toLowerCase();
-
 interface UserPdfProps {
   user: User;
-  logoUrl?: string; // logo da empresa
+  logoUrl?: string;
 }
-
-// Função para buscar imagem via proxy e retornar DataURL
-const fetchImageProxy = async (url: string): Promise<string | null> => {
-  try {
-    const res = await fetch("/api/download-image", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ url }),
-    });
-    if (!res.ok) return null;
-    const blob = await res.blob();
-    return new Promise<string>((resolve) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result as string);
-      reader.readAsDataURL(blob);
-    });
-  } catch {
-    return null;
-  }
-};
 
 export function UserPdfButton({ user, logoUrl }: UserPdfProps) {
   const generatePdf = async () => {
     const toastId = toast.loading("Gerando PDF...");
     const doc = new jsPDF();
-    const pageHeight = 297; // A4 mm
+    const pageHeight = 297; // A4 height in mm
     let y = 20;
 
-    // ================= PÁGINA 1: INFORMAÇÕES =================
+    // ================= PAGE 1: USER INFORMATION =================
     if (logoUrl) {
       const logoImg = await fetchImageProxy(logoUrl);
       if (logoImg) doc.addImage(logoImg, "PNG", 20, 10, 30, 30);
@@ -63,6 +35,9 @@ export function UserPdfButton({ user, logoUrl }: UserPdfProps) {
     doc.text("Ficha do Usuário", 105, y, { align: "center" });
     y += 15;
 
+    /**
+     * Adds a section with title and key-value fields.
+     */
     const addTableSection = (
       title: string,
       fields: Record<string, string | number | boolean | null | undefined>
@@ -101,7 +76,7 @@ export function UserPdfButton({ user, logoUrl }: UserPdfProps) {
       y += 5;
     };
 
-    // ================= DADOS PESSOAIS =================
+    // ================= PERSONAL DATA =================
     addTableSection("Dados Pessoais", {
       ID: user.id,
       Nome: `${user.nome} ${user.sobrenome}`,
@@ -115,7 +90,7 @@ export function UserPdfButton({ user, logoUrl }: UserPdfProps) {
       "Primeiro Acesso": user.isNotFirstTime ? "Já acessou" : "Primeiro acesso",
     });
 
-    // ================= INFORMAÇÕES ACADÊMICAS =================
+    // ================= ACADEMIC INFORMATION =================
     addTableSection("Informações Acadêmicas (ESTTU)", {
       Curso: user.curso,
       Escolaridade: user.escolaridade,
@@ -124,7 +99,7 @@ export function UserPdfButton({ user, logoUrl }: UserPdfProps) {
       Classe: user.classe,
     });
 
-    // ================= ENDEREÇO =================
+    // ================= ADDRESS =================
     addTableSection("Endereço", {
       Endereço: `${user.endereco ?? ""}, ${user.numero ?? ""}`,
       Complemento: user.complemento,
@@ -133,7 +108,7 @@ export function UserPdfButton({ user, logoUrl }: UserPdfProps) {
       Estado: user.estado,
     });
 
-    // ================= DADOS DE SAÚDE (GITTU) =================
+    // ================= HEALTH DATA (GITTU) =================
     if (user.cid) {
       addTableSection("Dados de Saúde (GITTU)", {
         CID: user.cid,
@@ -143,11 +118,11 @@ export function UserPdfButton({ user, logoUrl }: UserPdfProps) {
       });
     }
 
-    // Rodapé página 1
+    // Footer of page 1
     doc.setFontSize(10);
     doc.text(`Gerado em: ${new Date().toLocaleString()}`, 20, pageHeight - 10);
 
-    // ================= PÁGINA 2: DOCUMENTOS IMAGENS =================
+    // ================= PAGE 2: DOCUMENT IMAGES =================
     doc.addPage();
     y = 20;
 
@@ -175,6 +150,7 @@ export function UserPdfButton({ user, logoUrl }: UserPdfProps) {
       let imgWidth = img.width;
       let imgHeight = img.height;
 
+      // Scale image proportionally
       if (imgWidth > maxWidth) {
         const ratio = maxWidth / imgWidth;
         imgWidth = maxWidth;
@@ -202,7 +178,7 @@ export function UserPdfButton({ user, logoUrl }: UserPdfProps) {
       y += imgHeight + 10;
     }
 
-    // Rodapé última página
+    // Footer of the last page
     doc.setFontSize(10);
     doc.text(`Gerado em: ${new Date().toLocaleString()}`, 20, pageHeight - 10);
 

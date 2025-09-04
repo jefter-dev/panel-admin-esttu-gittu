@@ -2,7 +2,6 @@
 
 import { useAdminDetails } from "@/hooks/admin/use-admin-details";
 
-// Componentes de UI
 import {
   Card,
   CardContent,

@@ -14,25 +14,40 @@ export class PaymentService {
   }
 
   /**
-   * Orquestra o registro de um novo pagamento vindo de uma requisição externa.
-   * @param payload Os dados do pagamento validados, contendo o userId.
-   * @returns O registro de pagamento criado.
-   * @throws {RecordNotFoundError} Se o usuário especificado no payload não for encontrado.
+   * @summary Orchestrates the creation of a new payment.
+   * @param payload {PaymentCreateInput} Validated payment input including userId.
+   * @returns {Promise<Payment>} The created payment record.
+   * @throws {RecordNotFoundError} If the specified user does not exist.
    */
   async createPayment(payload: PaymentCreateInput): Promise<Payment> {
     const payloadForRepo: PaymentCreatePayload = {
       ...payload,
-      paymentDate: Timestamp.fromDate(new Date(payload.paymentDate)), // <- conversão aqui
+      paymentDate: Timestamp.fromDate(new Date(payload.paymentDate)),
     };
 
     return await this.paymentRepository.create(payloadForRepo);
   }
 
-  // O método getPaymentsForUser permanece o mesmo, pois ele já recebia o userId
+  /**
+   * @summary Retrieves all payments for a specific user.
+   * @param userId {string} ID of the user.
+   * @returns {Promise<Payment[]>} List of payments for the user.
+   */
   async getPaymentsForUser(userId: string): Promise<Payment[]> {
     return this.paymentRepository.findByUserId(userId);
   }
 
+  /**
+   * @summary Lists payments with optional pagination, search, and date filters.
+   * @param options {Object} Filtering and pagination options.
+   * @param options.limit {number} Optional maximum number of records.
+   * @param options.startAfter {string} Optional ID to start after for pagination.
+   * @param options.search {string} Optional search term.
+   * @param options.dateFrom {string} Start date for filtering.
+   * @param options.dateTo {string} End date for filtering.
+   * @param options.app {APP} App context.
+   * @returns {Promise<Payment[]>} List of payments matching the criteria.
+   */
   async list(options: {
     limit?: number;
     startAfter?: string;
@@ -45,8 +60,9 @@ export class PaymentService {
   }
 
   /**
-   * Retorna os pagamentos do mês corrente, agrupados por dia.
-   * Útil para gráficos.
+   * @summary Retrieves current month's payments grouped by day for charting.
+   * @param app {APP} App context.
+   * @returns {Promise<Array<{ date: string; total: number }>>} Payments aggregated by day.
    */
   async getPaymentsCurrentMonth(
     app: APP
@@ -54,6 +70,13 @@ export class PaymentService {
     return this.paymentRepository.getPaymentsCurrentMonth(app);
   }
 
+  /**
+   * @summary Returns total payment amount within a specific date range.
+   * @param app {APP} App context.
+   * @param dateFrom {string} Start date.
+   * @param dateTo {string} End date.
+   * @returns {Promise<number>} Total amount of payments.
+   */
   async getTotalAmountByDateRange(
     app: APP,
     dateFrom: string,
@@ -67,7 +90,9 @@ export class PaymentService {
   }
 
   /**
-   * Retorna o valor total de pagamentos do dia atual.
+   * @summary Returns total payments and count for today.
+   * @param app {APP} App context.
+   * @returns {Promise<{ count: number; totalAmount: number }>} Payment summary for today.
    */
   async getPaymentsSummaryToday(
     app: APP
@@ -76,14 +101,18 @@ export class PaymentService {
   }
 
   /**
-   * Retorna os pagamentos do dia atual.
+   * @summary Retrieves all payments made today.
+   * @param app {APP} App context.
+   * @returns {Promise<Payment[]>} List of today's payments.
    */
   async getPaymentsToday(app: APP): Promise<Payment[]> {
     return this.paymentRepository.getPaymentsToday(app);
   }
 
   /**
-   * Retorna a quantidade e o valor total de pagamentos do mês corrente.
+   * @summary Returns total payments and count for the current month.
+   * @param app {APP} App context.
+   * @returns {Promise<{ count: number; totalAmount: number }>} Payment summary for the current month.
    */
   async getPaymentsSummaryCurrentMonth(
     app: APP
@@ -91,6 +120,13 @@ export class PaymentService {
     return this.paymentRepository.getPaymentsSummaryCurrentMonth(app);
   }
 
+  /**
+   * @summary Retrieves payments within a specified date range, aggregated by day.
+   * @param app {APP} App context.
+   * @param dateFrom {string} Start date.
+   * @param dateTo {string} End date.
+   * @returns {Promise<Array<{ date: string; total: number }>>} Payments grouped by day.
+   */
   async getPaymentsByDateRange(
     app: APP,
     dateFrom: string,

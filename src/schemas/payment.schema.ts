@@ -1,75 +1,86 @@
+/**
+ * @file schemas/payment.ts
+ *
+ * @summary Zod schemas and types for payment validation.
+ * Includes allowed payment methods, statuses, and creation payload.
+ */
+
 import { APP_VALUES } from "@/types/app.type";
 import { z } from "zod";
 
-// Métodos de pagamento permitidos
+// ===================================================
+// Allowed payment methods
+// ===================================================
 export const paymentMethods = ["CREDIT_CARD", "PIX", "BOLETO"] as const;
 export type PaymentMethod = (typeof paymentMethods)[number];
 
-// Status de pagamento permitidos
+// ===================================================
+// Allowed payment statuses
+// ===================================================
 export const paymentStatuses = [
-  "PENDING", // Aguardando Pagamento
-  "PAID", // Pago
-  "CANCELLED", // Cancelado
-  "REFUNDED", // Estornado
-  "BANK_PROCESSING", // Enviado para o banco
-  "FAILED", // Falhou
-  "AWAITING_CHECKOUT_RISK_ANALYSIS_REQUEST", // Em análise
+  "PENDING", // Awaiting payment
+  "PAID", // Paid
+  "CANCELLED", // Cancelled
+  "REFUNDED", // Refunded
+  "BANK_PROCESSING", // Sent to bank
+  "FAILED", // Failed
+  "AWAITING_CHECKOUT_RISK_ANALYSIS_REQUEST", // Under review
 ] as const;
 export type PaymentStatus = (typeof paymentStatuses)[number];
 
-// Schema de criação de pagamento
+// ===================================================
+// Schema for PAYMENT CREATION
+// Validates all required fields for creating a new payment.
+// ===================================================
 export const paymentCreateSchema = z.object({
-  // ID interno do pagamento (UUID do seu sistema)
-  id: z.uuid({ message: "O ID do pagamento deve ser um UUID válido." }),
+  /** Internal payment ID (UUID of the system) */
+  id: z.uuid({ message: "Payment ID must be a valid UUID." }),
 
-  // Identificação de qual app o usuário é
-  app: z.enum(APP_VALUES, {
-    message: "A aplicação é obrigatória.",
-  }),
+  /** Application identifier */
+  app: z.enum(APP_VALUES, { message: "Application is required." }),
 
-  // ID único do pagamento no gateway (Asaas, Pagar.me, Stripe, etc.)
-  gatewayPaymentId: z.string({
-    message: "O ID do gateway é obrigatório.",
-  }),
+  /** Gateway payment ID (Asaas, Pagar.me, Stripe, etc.) */
+  gatewayPaymentId: z.string({ message: "Gateway ID is required." }),
 
-  // ID do evento no gateway (útil para auditoria de webhooks)
+  /** Gateway event ID for webhook auditing */
   gatewayEventId: z.string().optional(),
 
-  // UUID do usuário dono do pagamento
-  userId: z.string({ message: "O ID do usuário é obrigatório." }),
+  /** User ID (UUID) who owns the payment */
+  userId: z.string({ message: "User ID is required." }),
 
-  // Valor em reais
+  /** Amount in BRL */
   amount: z
-    .number({ message: "O valor é obrigatório." })
-    .positive({ message: "O valor deve ser positivo." }),
+    .number({ message: "Amount is required." })
+    .positive({ message: "Amount must be positive." }),
 
-  // Método de pagamento
-  method: z.enum(paymentMethods, {
-    message: "O método de pagamento é obrigatório.",
-  }),
+  /** Payment method */
+  method: z.enum(paymentMethods, { message: "Payment method is required." }),
 
-  // Status do pagamento
-  status: z.enum(paymentStatuses, {
-    message: "O status do pagamento é obrigatório.",
-  }),
+  /** Payment status */
+  status: z.enum(paymentStatuses, { message: "Payment status is required." }),
 
-  // Data do pagamento (ISO 8601 vinda do gateway)
+  /** Payment date in ISO 8601 format */
   paymentDate: z
     .string()
     .pipe(z.coerce.date())
     .refine((date) => !isNaN(date.getTime()), {
-      message: "A data do pagamento deve estar no formato ISO 8601.",
+      message: "Payment date must be in ISO 8601 format.",
     }),
 
-  // Descrição (ex: "Carteirinha Estudantil Física")
+  /** Description (e.g., "Student ID Card Physical") */
   description: z.string().optional(),
 
-  // Payload bruto do gateway para auditoria
+  /** Raw payload from gateway for auditing */
   metadata: z.record(z.string(), z.any()).optional(),
 
-  customerName: z.string({ message: "O nome do cliente é obrigatório." }),
-  customerCpf: z.string({ message: "O CPF do cliente é obrigatório." }),
+  /** Customer name */
+  customerName: z.string({ message: "Customer name is required." }),
+
+  /** Customer CPF */
+  customerCpf: z.string({ message: "Customer CPF is required." }),
 });
 
-// Types derivados do schema
+// ===================================================
+// Type inferred from schema
+// ===================================================
 export type PaymentCreateInput = z.infer<typeof paymentCreateSchema>;

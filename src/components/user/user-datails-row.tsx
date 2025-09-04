@@ -36,7 +36,7 @@ function DetailItem({
   );
 }
 
-// Documentos
+// Documents
 function UserDocuments({ user }: { user: User }) {
   const qrCodeUrl = getUrlQrCode(user);
   const canvasId = `qrcode-expanded-${user.idDocument}`;
@@ -98,7 +98,7 @@ function UserDocuments({ user }: { user: User }) {
   );
 }
 
-// Dados Pessoais
+// Personal Data
 function UserPersonalData({ user }: { user: User }) {
   return (
     <div className="space-y-4">
@@ -112,7 +112,7 @@ function UserPersonalData({ user }: { user: User }) {
   );
 }
 
-// Endereço + Financeiro
+// Address + Finance
 function UserAddressAndFinance({ user }: { user: User }) {
   return (
     <div className="space-y-4">
@@ -150,7 +150,7 @@ function UserAddressAndFinance({ user }: { user: User }) {
   );
 }
 
-// Dados Acadêmicos ou Médicos
+// Academic Data or Doctors
 function UserAcademicOrMedicalData({ user }: { user: User }) {
   const isEsttu = !!user.curso;
 

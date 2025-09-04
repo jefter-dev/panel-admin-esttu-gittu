@@ -7,15 +7,15 @@ export function UserDetailsSkeleton() {
   return (
     <div className="p-4 bg-muted rounded-sm animate-pulse">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        {/* Documentos */}
+        {/* Documents */}
         <div className="space-y-4">
-          <Skeleton className="h-5 w-32" /> {/* Título */}
-          <Skeleton className="h-24 w-24 rounded-md" /> {/* Foto */}
-          <Skeleton className="h-8 w-20" /> {/* Botão Baixar */}
+          <Skeleton className="h-5 w-32" /> {/* Title */}
+          <Skeleton className="h-24 w-24 rounded-md" /> {/* Photo */}
+          <Skeleton className="h-8 w-20" /> {/* Button Download */}
           <Skeleton className="h-8 w-24" /> {/* QR Code Button */}
         </div>
 
-        {/* Dados Pessoais */}
+        {/* Personal Data */}
         <div className="space-y-4">
           <Skeleton className="h-5 w-32" />
           {Array.from({ length: 5 }).map((_, i) => (
@@ -23,7 +23,7 @@ export function UserDetailsSkeleton() {
           ))}
         </div>
 
-        {/* Dados Acadêmicos ou Médicos */}
+        {/* Academic Data or Doctors */}
         <div className="space-y-4">
           <Skeleton className="h-5 w-36" />
           {Array.from({ length: 4 }).map((_, i) => (
@@ -31,7 +31,7 @@ export function UserDetailsSkeleton() {
           ))}
         </div>
 
-        {/* Endereço + Financeiro */}
+        {/* Address + Finance */}
         <div className="space-y-4">
           <Skeleton className="h-5 w-24" />
           {Array.from({ length: 3 }).map((_, i) => (

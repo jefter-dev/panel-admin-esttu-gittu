@@ -41,7 +41,6 @@ export function DataTableToolbar<TData>({
   );
   const [filterValue, setFilterValue] = React.useState("");
 
-  // Nenhuma mudança na lógica dos hooks e funções
   React.useEffect(() => {
     const handler = setTimeout(() => {
       onFilterChange({
@@ -77,16 +76,12 @@ export function DataTableToolbar<TData>({
   };
 
   return (
-    // 👇 MUDANÇA 1: O container principal agora é flex-col por padrão e vira flex-row em telas médias (md) ou maiores.
     <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between py-4">
-      {/* Esquerda: busca global + pagamento */}
-      {/* 👇 MUDANÇA 2: Este grupo também se adapta. Em telas pequenas (sm), os itens ficam em linha. Em telas muito pequenas, eles se empilham. */}
       <div className="flex flex-col sm:flex-row items-center gap-4">
         <Input
           placeholder="Pesquisar por nome, CPF ou e-mail"
           value={currentSearch}
           onChange={(event) => setCurrentSearch(event.target.value)}
-          // Ocupa toda a largura em telas pequenas e tem largura definida em telas maiores
           className="w-full sm:w-64"
         />
 
@@ -110,8 +105,6 @@ export function DataTableToolbar<TData>({
         </Select>
       </div>
 
-      {/* Direita: filtro avançado (tipo + valor + ações) */}
-      {/* 👇 MUDANÇA 3: O grupo de filtros avançados usa `flex-wrap` para que os itens quebrem para a próxima linha se não houver espaço. */}
       <div className="flex flex-col lg:flex-row items-center gap-4">
         <div className="flex flex-col sm:flex-row w-full lg:w-auto items-center gap-4">
           <Select
@@ -139,7 +132,6 @@ export function DataTableToolbar<TData>({
           />
         </div>
 
-        {/* 👇 MUDANÇA 4: Agrupador para os botões para que fiquem juntos e se adaptem melhor. */}
         <div className="flex flex-col lg:flex-row items-center gap-2 w-full lg:w-auto">
           <Button
             variant="default"

@@ -31,7 +31,7 @@ export const columns: ColumnDef<User>[] = [
         <span className="sr-only">Detalhes</span>
       </Button>
     ),
-    // Desabilitar ordenação e ocultação para esta coluna
+    // Disabled ordenation
     enableSorting: false,
     enableHiding: false,
   },
@@ -74,7 +74,6 @@ export const columns: ColumnDef<User>[] = [
         </div>
       );
     },
-    // Função de filtro personalizada para o status do pagamento
     filterFn: (row, columnId, filterValue) => {
       const value = row.getValue(columnId);
       return (

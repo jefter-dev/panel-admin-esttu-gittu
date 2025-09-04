@@ -14,8 +14,6 @@ export function useUserProfile() {
   const [isLoading, setIsLoading] = useState(true); // O estado de loading do *perfil*
 
   useEffect(() => {
-    console.log("useUserProfile [useUserProfile]");
-
     // MUDANÇA 2: Se a sessão ainda estiver carregando, não faça nada. Apenas espere.
     if (isSessionLoading) {
       return;

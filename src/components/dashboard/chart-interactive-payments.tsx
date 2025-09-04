@@ -40,7 +40,6 @@ export type PaymentChartItem = {
   total: number;
 };
 
-// 🔹 Tipos auxiliares
 export type TimeRange = "7d" | "30d" | "90d";
 export type ChartType = "area" | "bar";
 
@@ -74,7 +73,6 @@ export function ChartInteractivePayments() {
           Total registrado no período selecionado
         </CardDescription>
         <CardAction className="flex gap-2">
-          {/* Filtro de período */}
           <ToggleGroup
             type="single"
             value={timeRange}
@@ -112,7 +110,6 @@ export function ChartInteractivePayments() {
             </SelectContent>
           </Select>
 
-          {/* Select do tipo de gráfico */}
           <Select
             value={chartType}
             onValueChange={(v: ChartType) => setChartType(v)}

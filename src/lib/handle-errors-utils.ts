@@ -11,6 +11,11 @@ import {
   WebhookError,
 } from "@/errors/custom.errors";
 
+/**
+ * @summary Handles errors thrown in API routes and maps them to proper HTTP responses.
+ * @param error {unknown} The error object thrown during route processing.
+ * @returns {NextResponse} Returns a NextResponse with appropriate status code and error message.
+ */
 export const handleRouteError = (error: unknown): NextResponse => {
   if (error instanceof ValidationError) {
     return NextResponse.json(
@@ -21,23 +26,21 @@ export const handleRouteError = (error: unknown): NextResponse => {
 
   if (error instanceof ConfigurationError) {
     return NextResponse.json(
-      {
-        error: error.message || "Ocorreu um erro de configuração no servidor.",
-      },
+      { error: error.message || "Server configuration error." },
       { status: 500 }
     );
   }
 
   if (error instanceof InvalidCredentialsError) {
     return NextResponse.json(
-      { error: error.message || "E-mail ou senha inválidos." },
+      { error: error.message || "Invalid email or password." },
       { status: 401 } // Unauthorized
     );
   }
 
   if (error instanceof AuthenticationError) {
     return NextResponse.json(
-      { error: error.message || "Não autenticado." },
+      { error: error.message || "Not authenticated." },
       { status: 401 }
     );
   }
@@ -47,21 +50,20 @@ export const handleRouteError = (error: unknown): NextResponse => {
   }
 
   if (error instanceof DuplicateRecordError) {
-    console.log("ERROR: ", error);
     return NextResponse.json({ error: error.message }, { status: 409 });
   }
 
   if (error instanceof DataPersistenceError) {
-    console.error("[API_ERROR] Falha de persistência:", error.cause || error);
+    console.error("[API_ERROR] Persistence failure:", error.cause || error);
     return NextResponse.json(
-      { error: "Ocorreu uma falha no servidor ao processar sua requisição." },
+      { error: "Server failed to process the request." },
       { status: 500 }
     );
   }
 
   if (error instanceof ZodError) {
     return NextResponse.json(
-      { error: "Dados inválidos.", details: z.treeifyError(error) },
+      { error: "Invalid data.", details: z.treeifyError(error) },
       { status: 400 }
     );
   }
@@ -70,9 +72,9 @@ export const handleRouteError = (error: unknown): NextResponse => {
     return NextResponse.json({ error: error.message }, { status: 401 });
   }
 
-  console.error("[API_ERROR] Erro inesperado:", error);
+  console.error("[API_ERROR] Unexpected error:", error);
   return NextResponse.json(
-    { error: "Ocorreu um erro interno inesperado." },
+    { error: "Unexpected internal server error." },
     { status: 500 }
   );
 };

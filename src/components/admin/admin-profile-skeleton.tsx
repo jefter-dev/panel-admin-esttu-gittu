@@ -14,7 +14,7 @@ export function AdminProfileCardSkeleton() {
   return (
     <Card className="w-full max-w-lg animate-pulse">
       <CardHeader className="text-center">
-        {/* Nome */}
+        {/* Name */}
         <CardTitle>
           <Skeleton className="mx-auto h-8 w-48 rounded" />
         </CardTitle>
@@ -24,22 +24,22 @@ export function AdminProfileCardSkeleton() {
         </CardDescription>
       </CardHeader>
       <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4 text-sm">
-        {/* Acesso */}
+        {/* Access */}
         <div>
           <p className="font-semibold text-muted-foreground">Acesso</p>
           <Skeleton className="h-6 w-24 rounded mt-1" />
         </div>
-        {/* Aplicação (App) */}
+        {/* Application (App) */}
         <div>
           <p className="font-semibold text-muted-foreground">Aplicação (App)</p>
           <Skeleton className="h-6 w-24 rounded mt-1" />
         </div>
-        {/* Criado em */}
+        {/* Create at */}
         <div className="sm:col-span-2">
           <p className="font-semibold text-muted-foreground">Criado em</p>
           <Skeleton className="h-4 w-48 rounded mt-1" />
         </div>
-        {/* Última Atualização */}
+        {/* Last updated */}
         <div className="sm:col-span-2">
           <p className="font-semibold text-muted-foreground">
             Última Atualização

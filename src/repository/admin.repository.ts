@@ -1,5 +1,3 @@
-// src/repository/admin.repository.ts
-
 import { v4 as uuidv4 } from "uuid";
 import { FirestoreBaseService } from "@/service/firebase/firestore-base.service";
 import type { Firestore } from "firebase-admin/firestore";
@@ -14,6 +12,9 @@ import {
 } from "@/errors/custom.errors";
 import { DATABASE_COLLECTION_ADMINS } from "@/lib/firebase-admin";
 
+/**
+ * @summary Repository for Firestore operations related to Admins.
+ */
 export class AdminRepository extends FirestoreBaseService {
   private collection: FirebaseFirestore.CollectionReference;
 
@@ -23,10 +24,10 @@ export class AdminRepository extends FirestoreBaseService {
   }
 
   /**
-   * Encontra um administrador pelo seu campo 'id' (UUID).
-   * @param id O UUID do administrador.
-   * @returns O objeto Admin ou null se não for encontrado.
-   * @throws {DataPersistenceError} Se ocorrer uma falha na consulta ao banco de dados.
+   * @summary Finds an admin by their unique UUID.
+   * @param id {string} The UUID of the admin.
+   * @returns {Promise<Admin | null>} The admin object or null if not found.
+   * @throws {DataPersistenceError} If a database query fails.
    */
   async findById(id: string): Promise<Admin | null> {
     try {
@@ -38,18 +39,18 @@ export class AdminRepository extends FirestoreBaseService {
       return this.mapDocTo<Admin>(snapshot.docs[0]);
     } catch (error) {
       console.error(
-        `[AdminRepository.findById] Erro ao buscar admin com id ${id}:`,
+        `[AdminRepository.findById] Error fetching admin ${id}:`,
         error
       );
-      throw new DataPersistenceError("Falha ao buscar administrador por ID.");
+      throw new DataPersistenceError("Failed to fetch admin by ID.");
     }
   }
 
   /**
-   * Encontra um administrador pelo seu e-mail.
-   * @param email O e-mail do administrador.
-   * @returns O objeto Admin ou null se não for encontrado.
-   * @throws {DataPersistenceError} Se ocorrer uma falha na consulta ao banco de dados.
+   * @summary Finds an admin by their email.
+   * @param email {string} The email of the admin.
+   * @returns {Promise<Admin | null>} The admin object or null if not found.
+   * @throws {DataPersistenceError} If a database query fails.
    */
   async getByEmail(email: string): Promise<Admin | null> {
     try {
@@ -58,20 +59,18 @@ export class AdminRepository extends FirestoreBaseService {
       return this.mapDocTo<Admin>(snapshot.docs[0]);
     } catch (error) {
       console.error(
-        `[AdminRepository.getByEmail] Erro ao buscar admin com email ${email}:`,
+        `[AdminRepository.getByEmail] Error fetching admin ${email}:`,
         error
       );
-      throw new DataPersistenceError(
-        "Falha ao buscar administrador por e-mail."
-      );
+      throw new DataPersistenceError("Failed to fetch admin by email.");
     }
   }
 
   /**
-   * Cria um novo admin no Firestore, gerando e adicionando um UUID como campo 'id'.
-   * @param payload Os dados do admin a serem criados (sem o 'id').
-   * @returns O objeto Admin completo, incluindo o novo UUID.
-   * @throws {DataPersistenceError} Se a operação de escrita no banco de dados falhar.
+   * @summary Creates a new admin in Firestore with a generated UUID.
+   * @param payload {AdminCreatePayload} Admin data to be saved (without 'id').
+   * @returns {Promise<Admin>} The newly created admin including the UUID.
+   * @throws {DataPersistenceError} If the write operation fails.
    */
   async create(payload: AdminCreatePayload): Promise<Admin> {
     try {
@@ -80,55 +79,43 @@ export class AdminRepository extends FirestoreBaseService {
       await this.collection.add(dataToSave);
       return dataToSave;
     } catch (error) {
-      console.error(
-        "[AdminRepository.create] Erro ao criar novo admin:",
-        error
-      );
-      throw new DataPersistenceError(
-        "Falha ao criar administrador no banco de dados."
-      );
+      console.error("[AdminRepository.create] Error creating admin:", error);
+      throw new DataPersistenceError("Failed to create admin in database.");
     }
   }
 
   /**
-   * Atualiza um documento de admin existente, identificado pelo seu campo 'id' (UUID).
-   * @param id O UUID do admin a ser atualizado.
-   * @param payload Os campos a serem atualizados.
-   * @throws {DataPersistenceError} Se a operação de atualização no banco de dados falhar.
-   * @throws {Error} Se o documento com o ID fornecido não for encontrado.
+   * @summary Updates an existing admin identified by UUID.
+   * @param id {string} UUID of the admin to update.
+   * @param payload {AdminUpdatePayload} Fields to update.
+   * @throws {DataPersistenceError} If the update operation fails.
+   * @throws {Error} If the admin document is not found.
    */
   async update(id: string, payload: AdminUpdatePayload): Promise<void> {
-    console.log("payload [UPDATE USER]: ", payload);
-
     try {
       const snapshot = await this.collection
         .where("id", "==", id)
         .limit(1)
         .get();
       if (snapshot.empty) {
-        // Esta exceção é um caso extremo, pois o serviço já deve ter verificado a existência.
-        throw new Error(
-          `Documento para atualização não encontrado com o ID (UUID) ${id}.`
-        );
+        throw new Error(`Admin document not found with ID ${id}.`);
       }
       const docRef = snapshot.docs[0].ref;
       await docRef.update(payload);
     } catch (error) {
       console.error(
-        `[AdminRepository.update] Erro ao atualizar admin com id ${id}:`,
+        `[AdminRepository.update] Error updating admin ${id}:`,
         error
       );
-      throw new DataPersistenceError(
-        "Falha ao atualizar administrador no banco de dados."
-      );
+      throw new DataPersistenceError("Failed to update admin in database.");
     }
   }
 
   /**
-   * Remove um administrador pelo seu ID (UUID).
-   * @param id O UUID do admin a ser removido.
-   * @throws {RecordNotFoundError} Se o admin não existir.
-   * @throws {DataPersistenceError} Se ocorrer algum erro no Firestore.
+   * @summary Deletes an admin by UUID.
+   * @param id {string} UUID of the admin to delete.
+   * @throws {RecordNotFoundError} If the admin does not exist.
+   * @throws {DataPersistenceError} If the deletion fails.
    */
   async delete(id: string): Promise<void> {
     try {
@@ -137,40 +124,35 @@ export class AdminRepository extends FirestoreBaseService {
         .limit(1)
         .get();
       if (snapshot.empty) {
-        throw new RecordNotFoundError(
-          `Administrador com ID ${id} não encontrado.`
-        );
+        throw new RecordNotFoundError(`Admin with ID ${id} not found.`);
       }
       const docRef = snapshot.docs[0].ref;
       await docRef.delete();
     } catch (error) {
       console.error(
-        `[AdminRepository.delete] Erro ao remover admin com id ${id}:`,
+        `[AdminRepository.delete] Error deleting admin ${id}:`,
         error
       );
       if (error instanceof RecordNotFoundError) throw error;
-      throw new DataPersistenceError(
-        "Falha ao remover administrador do banco de dados."
-      );
+      throw new DataPersistenceError("Failed to delete admin from database.");
     }
   }
 
   /**
-   * Retorna todos os admins do Firestore.
+   * @summary Returns all admins from Firestore.
+   * @returns {Promise<Admin[]>} Array of all admin objects.
+   * @throws {DataPersistenceError} If the query fails.
    */
   async findAll(): Promise<Admin[]> {
     try {
       const snapshot = await this.collection.get();
-      const admins: Admin[] = snapshot.docs.map((doc) =>
-        this.mapDocTo<Admin>(doc)
-      );
-      return admins;
+      return snapshot.docs.map((doc) => this.mapDocTo<Admin>(doc));
     } catch (error) {
       console.error(
-        "[AdminRepository.findAll] Erro ao buscar todos os admins:",
+        "[AdminRepository.findAll] Error fetching all admins:",
         error
       );
-      throw new DataPersistenceError("Falha ao listar administradores.");
+      throw new DataPersistenceError("Failed to list admins.");
     }
   }
 }

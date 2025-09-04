@@ -60,7 +60,7 @@ export const AdminTableActions: React.FC<AdminTableActionsProps> = ({
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
               <DropdownMenuItem
-                onSelect={(e) => e.preventDefault()} // impede fechar o menu ao abrir o modal
+                onSelect={(e) => e.preventDefault()}
                 className="gap-2 cursor-pointer text-red-600"
               >
                 <Trash2 size={14} />

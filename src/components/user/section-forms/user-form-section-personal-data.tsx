@@ -24,7 +24,6 @@ export function PersonalDataSection({
     <div className="col-span-12 lg:col-span-7 space-y-4 rounded-md border p-6">
       <h2 className="text-xl font-semibold">Dados Pessoais</h2>
 
-      {/* Linha 1: Nome, Sobrenome, CPF */}
       <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
         <FormField
           control={control}
@@ -78,7 +77,6 @@ export function PersonalDataSection({
         />
       </div>
 
-      {/* Linha 2: Email, Celular, RG, Data de Nascimento */}
       <div className="grid grid-cols-1 gap-6 md:grid-cols-4">
         <FormField
           control={control}

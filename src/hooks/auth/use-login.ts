@@ -22,8 +22,6 @@ export function useLogin() {
       const response = await axios.post<Tokens>("/api/auth/login", data);
       const tokens = response.data;
 
-      console.log("TOKENS: ", response, tokens);
-
       // Salva os tokens no cookie via SessionAdapter
       await SessionAdapter.saveTokens(tokens);
 
@@ -32,8 +30,6 @@ export function useLogin() {
       // Redireciona para o dashboard
       router.push("/dashboard");
     } catch (error) {
-      console.log("ERROR: ", error);
-
       if (isAxiosError(error)) {
         const errorMessage =
           error.response?.data?.error || "Erro ao fazer login.";

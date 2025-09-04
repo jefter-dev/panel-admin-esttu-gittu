@@ -31,13 +31,13 @@ export function PaymentsDataTableSkeleton({
         {/* Toolbar Skeleton */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 py-4">
           <div className="flex items-center gap-4">
-            <Skeleton className="h-8 w-64" /> {/* Input de busca */}
-            <Skeleton className="h-8 w-48" /> {/* Botão limpar */}
+            <Skeleton className="h-8 w-64" /> {/* Search Input */}
+            <Skeleton className="h-8 w-48" /> {/* Button clear */}
           </div>
           <Skeleton className="h-9 w-64" /> {/* DateRangePicker */}
         </div>
 
-        {/* Tabela Skeleton */}
+        {/* table Skeleton */}
         <div className="rounded-md border overflow-x-auto">
           <Table>
             <TableHeader>
@@ -54,16 +54,16 @@ export function PaymentsDataTableSkeleton({
                 <TableRow key={i}>
                   {columns.map((_, j) => (
                     <TableCell key={j}>
-                      {j === 0 ? ( // Coluna ID com Badge
+                      {j === 0 ? ( // Column ID with Badge
                         <div className="flex items-center gap-2">
                           <Skeleton className="h-4 w-12" />
                           <Skeleton className="h-5 w-20 rounded-full" />
                         </div>
-                      ) : j === 2 ? ( // Cliente (nome maior)
+                      ) : j === 2 ? ( // Client (full name)
                         <Skeleton className="h-4 w-40" />
                       ) : j === 3 ? ( // CPF
                         <Skeleton className="h-4 w-32" />
-                      ) : j === 6 ? ( // Data do Pagamento
+                      ) : j === 6 ? ( // Date payment
                         <Skeleton className="h-4 w-36" />
                       ) : (
                         <Skeleton className="h-4 w-20" />
@@ -76,11 +76,11 @@ export function PaymentsDataTableSkeleton({
           </Table>
         </div>
 
-        {/* Paginação Skeleton */}
+        {/* Pagination Skeleton */}
         <div className="flex items-center justify-end gap-4 py-4">
-          <Skeleton className="h-4 w-18" /> {/* Página X de Y */}
-          <Skeleton className="h-7 w-20" /> {/* Botão anterior */}
-          <Skeleton className="h-7 w-20" /> {/* Botão próximo */}
+          <Skeleton className="h-4 w-18" /> {/* Page X de Y */}
+          <Skeleton className="h-7 w-20" /> {/* Button previous */}
+          <Skeleton className="h-7 w-20" /> {/* Button next */}
         </div>
       </div>
     </div>

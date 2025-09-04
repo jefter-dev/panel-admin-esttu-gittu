@@ -23,7 +23,6 @@ export function useUserDetails(userId: string | null | undefined) {
       setIsLoading(true);
       try {
         const response = await apiClient.get<User>(`/users/${userId}`);
-        console.log("response: ", response);
         setUserDetails(response.data);
       } catch (err) {
         console.error("Erro ao buscar detalhes do perfil do usuário:", err);

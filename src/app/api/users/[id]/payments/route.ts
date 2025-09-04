@@ -1,11 +1,19 @@
+import { NextRequest, NextResponse } from "next/server";
+import { AuthService } from "@/service/auth/auth.service";
+import { PaymentService } from "@/service/payment.service";
+import { handleRouteError } from "@/lib/handle-errors-utils";
+import { AuthenticationError, ValidationError } from "@/errors/custom.errors";
+import { APP } from "@/types/app.type";
+import { isValidAppName } from "@/lib/auth/session";
+
 /**
  * @swagger
  * /api/users/{userId}/payments:
  *   get:
- *     summary: Lista os pagamentos de um usuário específico
+ *     summary: List all payments for a specific user
  *     description: >
- *       Retorna uma lista de todos os registros de pagamento associados a um determinado ID de usuário (UUID).
- *       Requer autenticação de um administrador ou do próprio usuário.
+ *       Returns a list of all payment records associated with a specific user ID (UUID).
+ *       Requires authentication of an admin or the user themselves.
  *     tags:
  *       - Users
  *     security:
@@ -14,14 +22,14 @@
  *       - in: path
  *         name: userId
  *         required: true
- *         description: O ID (UUID) do usuário cujos pagamentos serão listados.
+ *         description: The ID (UUID) of the user whose payments will be listed.
  *         schema:
  *           type: string
  *           format: uuid
  *         example: "d4a7c1b8-2a7e-4b9f-8d1a-3e5f7c9b2d6e"
  *     responses:
  *       '200':
- *         description: Lista de pagamentos retornada com sucesso. A lista pode estar vazia se o usuário não tiver pagamentos.
+ *         description: Payments list returned successfully. List may be empty if user has no payments.
  *         content:
  *           application/json:
  *             schema:
@@ -32,24 +40,24 @@
  *                   id:
  *                     type: string
  *                     format: uuid
- *                     description: ID único do registro de pagamento.
+ *                     description: Unique ID of the payment record.
  *                     example: "f4b3c2a1-1a2b-3c4d-5e6f-7g8h9i0j1k2l"
  *                   userId:
  *                     type: string
  *                     format: uuid
- *                     description: ID do usuário que realizou o pagamento.
+ *                     description: ID of the user who made the payment.
  *                     example: "d4a7c1b8-2a7e-4b9f-8d1a-3e5f7c9b2d6e"
  *                   gatewayPaymentId:
  *                     type: string
- *                     description: ID do pagamento no gateway externo ex. Asaas.
+ *                     description: Payment ID in the external gateway (e.g., Asaas).
  *                     example: "pay_1234567890abcd"
  *                   amount:
  *                     type: integer
- *                     description: Valor do pagamento em centavos.
+ *                     description: Payment amount in cents.
  *                     example: 5000
  *                   method:
  *                     type: string
- *                     description: O método de pagamento utilizado.
+ *                     description: Payment method used.
  *                     enum:
  *                       - CREDIT_CARD
  *                       - PIX
@@ -57,7 +65,7 @@
  *                     example: "CREDIT_CARD"
  *                   status:
  *                     type: string
- *                     description: O status atual do pagamento.
+ *                     description: Current payment status.
  *                     enum:
  *                       - CONFIRMED
  *                       - PENDING
@@ -67,15 +75,14 @@
  *                   createdAt:
  *                     type: string
  *                     format: date-time
- *                     description: Data e hora em que o registro foi criado (formato ISO 8601).
+ *                     description: Date and time when the record was created (ISO 8601 format).
  *                     example: "2023-10-27T14:30:00Z"
  *                   app:
  *                     type: string
- *                     description: A qual aplicação este pagamento pertence.
+ *                     description: Application to which this payment belongs.
  *                     example: "esttu"
- *
  *       '401':
- *         description: Não autorizado. O token de autenticação é inválido ou não foi fornecido.
+ *         description: Unauthorized. Authentication token is invalid or missing.
  *         content:
  *           application/json:
  *             schema:
@@ -83,10 +90,9 @@
  *               properties:
  *                 error:
  *                   type: string
- *                   example: "Sessão inválida ou token expirado."
- *
+ *                   example: "Invalid session or expired token."
  *       '404':
- *         description: Usuário não encontrado.
+ *         description: User not found.
  *         content:
  *           application/json:
  *             schema:
@@ -94,10 +100,9 @@
  *               properties:
  *                 error:
  *                   type: string
- *                   example: "Usuário não encontrado."
- *
+ *                   example: "User not found."
  *       '500':
- *         description: Erro interno do servidor.
+ *         description: Internal server error.
  *         content:
  *           application/json:
  *             schema:
@@ -105,46 +110,31 @@
  *               properties:
  *                 error:
  *                   type: string
- *                   example: "Ocorreu um erro interno no servidor."
+ *                   example: "An internal server error occurred."
  */
-
-import { NextRequest, NextResponse } from "next/server";
-import { AuthService } from "@/service/auth/auth.service";
-import { PaymentService } from "@/service/payment.service";
-import { handleRouteError } from "@/lib/handle-errors-utils";
-import { AuthenticationError, ValidationError } from "@/errors/custom.errors";
-import { APP } from "@/types/app.type";
-import { isValidAppName } from "@/lib/auth/session";
-
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    // 1. Autenticação
     const token = request.headers.get("Authorization")?.split(" ")[1];
     const session = await AuthService.verifyToken(token);
     if (!session?.id || !session?.app) {
-      throw new AuthenticationError("Sessão inválida ou token expirado.");
+      throw new AuthenticationError("Invalid session or expired token.");
     }
 
     const appDataBase: APP = session.app;
     if (!isValidAppName(appDataBase)) {
-      throw new ValidationError(
-        "Sessão não foi encontrada ou foi mal definida."
-      );
+      throw new ValidationError("Session not found or improperly defined.");
     }
 
     const { id } = await params;
 
-    // 3. Execução da Lógica de Negócio
     const paymentService = new PaymentService(appDataBase);
     const payments = await paymentService.getPaymentsForUser(id);
 
-    // 4. Resposta de Sucesso
     return NextResponse.json(payments, { status: 200 });
   } catch (error) {
-    // 5. Tratamento Centralizado de Erros
     return handleRouteError(error);
   }
 }

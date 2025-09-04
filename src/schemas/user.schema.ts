@@ -1,62 +1,111 @@
+/**
+ * @file schemas/user.ts
+ *
+ * @summary Zod schemas and types for user validation.
+ * Includes schemas for user creation and update.
+ */
+
 import { z } from "zod";
 
+// ===================================================
+// Schema for USER CREATION (POST)
+// All required fields must be provided.
+// ===================================================
 export const userCreateSchema = z.object({
-  nome: z.string().min(1, "O nome é obrigatório."),
-  sobrenome: z.string().min(1, "O sobrenome é obrigatório."),
-  email: z
-    .email("Formato de e-mail inválido.")
-    .min(1, "O e-mail é obrigatório."),
+  /** First name */
+  nome: z.string().min(1, "Nome is required."),
 
-  // A validação para celular agora permite um campo vazio ou um formato completo
+  /** Last name */
+  sobrenome: z.string().min(1, "Sobrenome is required."),
+
+  /** Email address */
+  email: z.email("Invalid email format.").min(1, "Email is required."),
+
+  /** Phone number in format (XX) XXXXX-XXXX or empty */
   celular: z
     .string()
     .refine((value) => !value || /^\(\d{2}\) \d{5}-\d{4}$/.test(value), {
-      message: "Formato de celular inválido. Use (XX) XXXXX-XXXX.",
+      message: "Invalid phone format. Use (XX) XXXXX-XXXX.",
     }),
 
-  // A validação para CPF agora permite um campo vazio ou um formato completo
+  /** CPF in format XXX.XXX.XXX-XX or empty */
   cpf: z
     .string()
     .refine((value) => !value || /^\d{3}\.\d{3}\.\d{3}-\d{2}$/.test(value), {
-      message: "Formato de CPF inválido. Use XXX.XXX.XXX-XX.",
+      message: "Invalid CPF format. Use XXX.XXX.XXX-XX.",
     }),
 
+  /** RG number */
   rg: z.string().optional().nullable(),
+
+  /** Birth date in dd/mm/yyyy format */
   dataNascimento: z
     .string()
     .refine((value) => !value || /^\d{2}\/\d{2}\/\d{4}$/.test(value), {
-      message: "Formato de data inválido. Use dd/mm/aaaa.",
+      message: "Invalid date format. Use dd/mm/yyyy.",
     }),
-  endereco: z.string().min(1, "O endereço é obrigatório."),
-  numero: z.string().min(1, "O número do endereço é obrigatório."),
+
+  /** Address street */
+  endereco: z.string().min(1, "Address is required."),
+
+  /** Address number */
+  numero: z.string().min(1, "Address number is required."),
+
+  /** Address complement */
   complemento: z.string().optional().nullable(),
 
+  /** CEP in format XXXXX-XXX */
   cep: z.string().refine((value) => !value || /^\d{5}-\d{3}$/.test(value), {
-    message: "Formato de CEP inválido. Use XXXXX-XXX.",
+    message: "Invalid CEP format. Use XXXXX-XXX.",
   }),
 
-  cidade: z.string().min(1, "A cidade é obrigatória."),
+  /** City */
+  cidade: z.string().min(1, "City is required."),
+
+  /** State (UF) abbreviation */
   estado: z
     .string()
-    .min(1, "O estado é obrigatório.")
-    .length(2, "O estado deve ser a sigla de 2 letras."),
-  curso: z.string().min(1, "O curso é obrigatório."),
-  escolaridade: z.string().min(1, "A escolaridade é obrigatória."),
-  instituicao: z.string().min(1, "A instituição de ensino é obrigatória."),
-  anoParaRenovacao: z.string().min(1, "O ano para renovação é obrigatório."),
+    .min(1, "State is required.")
+    .length(2, "State must be a 2-letter code."),
 
-  documentMatricula: z.url("URL inválida.").optional().nullable(),
-  documentoComFoto: z.url("URL inválida.").optional().nullable(),
-  fotoIdentificacao: z.url("URL inválida.").optional().nullable(),
+  /** Course */
+  curso: z.string().min(1, "Course is required."),
 
-  senha: z.string().min(6, "A senha deve ter pelo menos 6 caracteres."),
+  /** Education level */
+  escolaridade: z.string().min(1, "Education level is required."),
 
+  /** Institution */
+  instituicao: z.string().min(1, "Institution is required."),
+
+  /** Year for renewal */
+  anoParaRenovacao: z.string().min(1, "Renewal year is required."),
+
+  /** Enrollment document URL */
+  documentMatricula: z.url("Invalid URL.").optional().nullable(),
+
+  /** ID document with photo URL */
+  documentoComFoto: z.url("Invalid URL.").optional().nullable(),
+
+  /** Identification photo URL */
+  fotoIdentificacao: z.url("Invalid URL.").optional().nullable(),
+
+  /** Password (hashed or plain on creation) */
+  senha: z.string().min(6, "Password must be at least 6 characters."),
+
+  /** Payment status (optional, defaults to false) */
   pagamentoEfetuado: z.boolean().default(false),
 });
 
+// ===================================================
+// Schema for USER UPDATE (PATCH)
+// All fields optional, password cannot be updated via this schema.
+// ===================================================
 export const userUpdateSchema = userCreateSchema
   .partial()
   .omit({ senha: true });
 
+// ===================================================
+// Types inferred from schemas
+// ===================================================
 export type UserCreateInput = z.infer<typeof userCreateSchema>;
 export type UserUpdateInput = z.infer<typeof userUpdateSchema>;

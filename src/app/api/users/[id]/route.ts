@@ -16,31 +16,58 @@ import { z } from "zod";
  * @swagger
  * /api/users/{id}:
  *   get:
- *     summary: Busca um usuário por seu documentId
+ *     summary: Get a user by documentId
+ *     tags: [User]
  *     description: >
- *       Retorna os dados de um usuário específico com base no seu documentId.
- *       Requer autenticação de administrador ou do próprio usuário.
- *     tags:
- *       - Users
+ *       Returns a specific user's data based on their documentId.
+ *       Requires authentication as an admin or the user themselves.
  *     security:
  *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
- *         description: O idDocument do usuário a ser buscado.
+ *         description: The user's documentId to fetch.
  *         schema:
  *           type: string
  *         example: "AbCdeFg12345HiJk"
  *     responses:
- *       '200':
- *         description: Usuário encontrado com sucesso.
- *       '401':
- *         description: Não autorizado.
- *       '404':
- *         description: Usuário não encontrado.
- *       '500':
- *         description: Erro interno do servidor.
+ *       200:
+ *         description: User found successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ *       401:
+ *         description: Unauthorized or invalid session/token
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Invalid session or expired token."
+ *       404:
+ *         description: User not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "User with documentId AbCdeFg12345HiJk not found."
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Internal server error."
  */
 
 export async function GET(
@@ -48,29 +75,23 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    // 1. Autenticação
     const token = request.headers.get("Authorization")?.split(" ")[1];
     const session = await AuthService.verifyToken(token);
     if (!session?.id || !session?.app) {
-      throw new AuthenticationError("Sessão inválida ou token expirado.");
+      throw new AuthenticationError("Invalid session or expired token.");
     }
 
     const appDataBase: APP = session.app;
     if (!isValidAppName(appDataBase)) {
-      throw new ValidationError(
-        "Sessão não foi encontrada ou foi mal definida."
-      );
+      throw new ValidationError("Session not found or improperly defined.");
     }
 
-    // 2. Busca usuário
     const { id } = await params;
     const userService = new UserService(appDataBase);
     const user = await userService.findByDocumentId(id);
 
     if (!user) {
-      throw new RecordNotFoundError(
-        `Usuário com idDocument ${id} não encontrado.`
-      );
+      throw new RecordNotFoundError(`User with documentId ${id} not found.`);
     }
 
     return NextResponse.json(user, { status: 200 });
@@ -79,54 +100,123 @@ export async function GET(
   }
 }
 
+/**
+ * @swagger
+ * /api/users/{id}:
+ *   patch:
+ *     summary: Update a user by documentId
+ *     tags: [User]
+ *     description: >
+ *       Updates a user's information based on their documentId.
+ *       Requires authentication as an admin or the user themselves.
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: The user's documentId to update
+ *         schema:
+ *           type: string
+ *         example: "AbCdeFg12345HiJk"
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/UserUpdateInput'
+ *     responses:
+ *       200:
+ *         description: User successfully updated
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "User updated successfully."
+ *       400:
+ *         description: Invalid request body or empty payload
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Request body cannot be empty."
+ *       401:
+ *         description: Unauthorized or insufficient permissions
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "No permission to update this user."
+ *       404:
+ *         description: User not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "User to update not found."
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Internal server error."
+ */
+
 export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    // 1. Autenticação
     const token = request.headers.get("Authorization")?.split(" ")[1];
     const session = await AuthService.verifyToken(token);
     if (!session?.id || !session?.app) {
-      throw new AuthenticationError("Sessão inválida ou token expirado.");
+      throw new AuthenticationError("Invalid session or expired token.");
     }
 
     const appDataBase: APP = session.app;
     if (!isValidAppName(appDataBase)) {
-      throw new ValidationError(
-        "Sessão não foi encontrada ou foi mal definida."
-      );
+      throw new ValidationError("Session not found or improperly defined.");
     }
 
-    // 2. Validação body
     const body = await request.json();
     const validation = userUpdateSchema.safeParse(body);
     if (!validation.success) {
       throw new ValidationError(
-        "Dados inválidos.",
+        "Invalid data.",
         z.treeifyError(validation.error)
       );
     }
     if (Object.keys(validation.data).length === 0) {
-      throw new ValidationError("O corpo da requisição não pode estar vazio.");
+      throw new ValidationError("Request body cannot be empty.");
     }
 
-    // 3. Execução
     const { id } = await params;
     const userService = new UserService(appDataBase);
 
-    // ⚠️ Regra de autorização (se quiser restringir):
-    // se não for admin, só pode atualizar o próprio user
     if (session.role !== "admin" && session.idDocument !== id) {
-      throw new AuthenticationError(
-        "Sem permissão para atualizar este usuário."
-      );
+      throw new AuthenticationError("No permission to update this user.");
     }
 
     await userService.updateByDocumentId(id, validation.data);
 
     return NextResponse.json(
-      { message: "Usuário atualizado com sucesso." },
+      { message: "User updated successfully." },
       { status: 200 }
     );
   } catch (error) {

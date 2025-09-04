@@ -7,32 +7,91 @@ import { isValidAppName } from "@/lib/auth/session";
 import { APP_DATABASE_ADMIN } from "@/lib/firebase-admin";
 import { handleRouteError } from "@/lib/handle-errors-utils";
 
+/**
+ * @swagger
+ * /api/payments/current-month:
+ *   get:
+ *     summary: Get payments summary for the current month
+ *     tags: [Payments]
+ *     description: >
+ *       Retrieves a summary of payments (total count and amount) for the current month.
+ *     parameters:
+ *       - in: header
+ *         name: Authorization
+ *         required: true
+ *         schema:
+ *           type: string
+ *           example: "Bearer your_jwt_token_here"
+ *         description: Bearer token to authorize the request
+ *     responses:
+ *       200:
+ *         description: Payments summary retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 stats:
+ *                   type: object
+ *                   properties:
+ *                     totalAmount:
+ *                       type: number
+ *                       description: Total payment amount for the current month
+ *                     count:
+ *                       type: integer
+ *                       description: Total number of payments for the current month
+ *       401:
+ *         description: Unauthorized or invalid session/token
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Invalid session or expired token."
+ *       400:
+ *         description: Session not found or incorrectly defined
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Session not found or incorrectly defined."
+ *       500:
+ *         description: Internal server error while fetching current month payments summary
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Internal server error while fetching current month payments summary."
+ */
+
 export async function GET(request: Request) {
   try {
-    // Recupera token Bearer
     const token = request.headers.get("Authorization")?.split(" ")[1];
     const session = await AuthService.verifyToken(token);
 
     if (!session?.id || !session?.app) {
-      throw new AuthenticationError("Sessão inválida ou token expirado.");
+      throw new AuthenticationError("Invalid session or expired token.");
     }
 
     const appSession: APP = session.app;
     if (!isValidAppName(appSession)) {
-      throw new ValidationError(
-        "Sessão não foi encontrada ou foi mal definida."
-      );
+      throw new ValidationError("Session not found or incorrectly defined.");
     }
 
-    // Instancia o service
     const service = new PaymentService(APP_DATABASE_ADMIN);
-
-    // Chama o método para o mês corrente
     const stats = await service.getPaymentsSummaryCurrentMonth(appSession);
 
     return NextResponse.json({ stats }, { status: 200 });
   } catch (error) {
-    console.error("Erro ao buscar total de pagamentos do mês:", error);
+    console.error("Error fetching current month payments summary:", error);
     return handleRouteError(error);
   }
 }

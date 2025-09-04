@@ -4,7 +4,7 @@ import { AdminForm } from "@/components/admin/admin-form";
 import { useParams } from "next/navigation";
 
 export default function AdminRegisterPage() {
-  const params = useParams(); // useParams do Next.js App Router
+  const params = useParams();
   const adminId = params?.id as string;
 
   return (

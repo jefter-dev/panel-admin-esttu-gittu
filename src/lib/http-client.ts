@@ -3,35 +3,39 @@
 import axios from "axios";
 import { SessionAdapter } from "@/lib/session-adapter";
 
-// Cria uma instância do Axios com configurações padrão.
-// Usar uma instância é crucial para que os interceptores não afetem
-// outras possíveis chamadas axios em bibliotecas de terceiros.
+/**
+ * @summary Creates a pre-configured Axios instance for API requests.
+ * @description Using a dedicated instance ensures interceptors do not affect
+ * other Axios calls in third-party libraries.
+ */
 export const apiClient = axios.create({
-  // Define a URL base para todas as chamadas feitas com este cliente.
-  // Assim, você pode fazer apiClient.get('/users') em vez de apiClient.get('/api/users').
+  /**
+   * @description Base URL for all requests using this client.
+   * Allows calling `apiClient.get('/users')` instead of full path `/api/users`.
+   */
   baseURL: "/api",
 });
 
-// Adiciona um "interceptor" de requisição.
-// Esta função será executada ANTES de CADA requisição feita com `apiClient` ser enviada.
+/**
+ * @summary Axios request interceptor to attach access token to requests.
+ * @param config {import('axios').AxiosRequestConfig} The Axios request configuration object.
+ * @returns {Promise<import('axios').AxiosRequestConfig>} Modified config with Authorization header if token exists.
+ */
 apiClient.interceptors.request.use(
   async (config) => {
-    // 1. Tenta obter o token de acesso do cookie usando nosso adapter.
+    // 1. Get access token from cookie using SessionAdapter.
     const accessToken = await SessionAdapter.getAccessToken();
 
-    // 2. Se um token for encontrado, adiciona-o ao cabeçalho 'Authorization'.
+    // 2. Attach token to Authorization header if present.
     if (accessToken) {
-      // O formato `Bearer <token>` é o padrão para autenticação com JWT.
       config.headers.Authorization = `Bearer ${accessToken}`;
     }
 
-    // 3. Retorna a configuração modificada (ou a original se não houver token)
-    // para que a requisição possa continuar.
+    // 3. Return modified or original config to continue the request.
     return config;
   },
   (error) => {
-    console.log("ERROR: ", error);
-    // Se ocorrer um erro durante a configuração da requisição, rejeita a promessa.
+    // Reject the promise if any error occurs while setting up the request.
     return Promise.reject(error);
   }
 );

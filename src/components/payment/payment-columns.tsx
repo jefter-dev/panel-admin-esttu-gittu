@@ -2,7 +2,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { Payment } from "@/types/payment.type";
 import { Badge } from "@/components/ui/badge";
 import { PaymentMethod, PaymentStatus } from "@/types/payment.type";
-import { UserDetailsDialog } from "../user/user-datails-dialog";
+import { UserDetailsDialog } from "@/components/user/user-datails-dialog";
 
 export const columns: ColumnDef<Payment>[] = [
   {

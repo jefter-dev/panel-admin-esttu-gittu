@@ -38,7 +38,7 @@ export function UserFormPaymentSection({
             <FormControl>
               <Select
                 disabled={isDisabled}
-                value={field.value ? "true" : "false"} // <-- aqui
+                value={field.value ? "true" : "false"}
                 onValueChange={(value) => field.onChange(value === "true")}
               >
                 <SelectTrigger className="w-full">

@@ -11,11 +11,10 @@ import {
 } from "@/components/ui/table";
 
 export function TableSkeletonAdmin({ rowCount = 7 }: { rowCount?: number }) {
-  const columnCount = 6; // Avatar, Nome, Email, Role, Criado, Atualizado
+  const columnCount = 6;
 
   return (
     <div className="space-y-4">
-      {/* Skeleton para a Tabela */}
       <div className="rounded-md border">
         <Table>
           <TableHeader>

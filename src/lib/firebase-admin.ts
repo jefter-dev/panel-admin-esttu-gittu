@@ -5,13 +5,18 @@ import admin from "firebase-admin";
 export const APP_DATABASE_ADMIN = "admin";
 export const DATABASE_COLLECTION_ADMINS = "admins";
 
+/**
+ * @summary Retrieves Firebase credentials for a specific app from environment variables.
+ * @param app {APP} The application identifier.
+ * @returns {{ projectId: string; privateKey: string; clientEmail: string }} The Firebase credentials object.
+ * @throws {ConfigurationError} If any required environment variable is missing.
+ */
 function getCredentialsForApp(app: APP) {
   const getEnvVar = (key: string): string => {
     const value = process.env[key];
-    // 2. Lance o erro específico em vez de um Error genérico
     if (!value)
       throw new ConfigurationError(
-        `Variável de ambiente obrigatória ausente: ${key}`
+        `Missing required environment variable: ${key}`
       );
     return value.replace(/\\n/g, "\n");
   };
@@ -25,6 +30,11 @@ function getCredentialsForApp(app: APP) {
   };
 }
 
+/**
+ * @summary Returns a Firestore instance for the given app, initializing Firebase Admin if needed.
+ * @param app {APP} The application identifier.
+ * @returns {admin.firestore.Firestore} The Firestore instance for the app.
+ */
 export function getFirebaseAdmin(app: APP): admin.firestore.Firestore {
   try {
     return admin.app(app).firestore();
@@ -48,6 +58,13 @@ export function getFirebaseAdmin(app: APP): admin.firestore.Firestore {
   }
 }
 
+/**
+ * @summary Downloads a file from Firebase Storage for a specific app.
+ * @param app {APP} The application identifier.
+ * @param filePath {string} The path of the file in Firebase Storage.
+ * @returns {Promise<Buffer>} Returns a Buffer containing the file data.
+ * @throws {Error} If the download fails.
+ */
 export async function downloadImageFromFirebase(
   app: APP,
   filePath: string
@@ -60,9 +77,9 @@ export async function downloadImageFromFirebase(
     return buffer;
   } catch (error) {
     console.error(
-      `Falha ao baixar imagem do Firebase Storage para o app ${app}:`,
+      `Failed to download image from Firebase Storage for app ${app}:`,
       error
     );
-    throw new Error("Não foi possível processar a imagem.");
+    throw new Error("Unable to process the image.");
   }
 }

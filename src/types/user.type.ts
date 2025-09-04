@@ -1,216 +1,125 @@
 /**
- * Representa um usuário unificado no sistema, contendo todos os campos possíveis
- * das aplicações 'esttu' e 'gittu'. Campos específicos de cada aplicação são
- * marcados como opcionais para permitir flexibilidade.
+ * @file types/user.type.ts
+ *
+ * @summary Defines the unified User interface for the system, including all fields
+ * for both 'esttu' and 'gittu' applications. Fields specific to each app are optional.
+ */
+
+/**
+ * Represents a unified user in the system.
  */
 export interface User {
   // ======================================================
-  // CAMPOS COMUNS (Compartilhados por todas as aplicações)
+  // COMMON FIELDS (Shared across all applications)
   // ======================================================
 
-  /**
-   * O ID do documento no Firestore.
-   * @example "AbCdeFg12345HiJk"
-   */
+  /** Firestore document ID */
   idDocument: string;
 
-  /**
-   * O identificador único universal (UUID) do usuário.
-   * @example "d4a7c1b8-2a7e-4b9f-8d1a-3e5f7c9b2d6e"
-   */
+  /** Universal unique ID (UUID) for the user */
   id: string;
 
-  /**
-   * O primeiro nome do usuário.
-   * @example "João"
-   */
+  /** First name */
   nome: string;
 
-  /**
-   * O sobrenome do usuário.
-   * @example "da Silva"
-   */
+  /** Last name */
   sobrenome: string;
 
-  /**
-   * O endereço de e-mail do usuário, usado para login e comunicação.
-   * @example "joao.silva@example.com"
-   */
+  /** Email address */
   email: string;
 
-  /**
-   * O número de telefone celular do usuário.
-   * @example "11987654321"
-   */
+  /** Mobile phone number */
   celular: string;
 
-  /**
-   * O CPF (Cadastro de Pessoas Físicas) do usuário.
-   * @example "12345678901"
-   */
+  /** CPF (Brazilian individual taxpayer registry) */
   cpf: string;
 
-  /**
-   * O número do RG (Registro Geral) do usuário.
-   * @example "123456789"
-   */
+  /** RG (optional) */
   rg?: string | null | undefined;
 
-  /**
-   * A data de nascimento do usuário no formato "dd/mm/aaaa".
-   * @example "15/05/1998"
-   */
+  /** Birth date in "dd/mm/yyyy" format */
   dataNascimento: string;
 
-  /**
-   * A URL para a foto de identificação (selfie) do usuário.
-   * @example "https://example.com/fotos/selfie.jpg"
-   */
+  /** URL for user identification photo (selfie) */
   fotoIdentificacao?: string | null | undefined;
 
-  /**
-   * O hash da senha do usuário. **Este campo nunca deve ser enviado ao cliente.**
-   */
+  /** Password hash (never sent to client) */
   senha: string;
 
-  /**
-   * Indica se o pagamento da anuidade/taxa foi efetuado.
-   * @optional
-   */
+  /** Indicates if the payment has been completed */
   pagamentoEfetuado?: boolean;
 
-  /**
-   * A data e hora em que o pagamento foi realizado, em formato ISO 8601.
-   * @optional
-   * @example "2023-10-27T14:30:00Z"
-   */
+  /** Date and time of payment (ISO 8601) */
   dataPagamento?: string;
 
-  /**
-   * Flag para controlar fluxos de onboarding ou primeiro acesso.
-   * @optional
-   */
+  /** Flag for onboarding/first access flow */
   isNotFirstTime?: boolean | null;
 
   // ======================================================
-  // CAMPOS ESPECÍFICOS DA APLICAÇÃO 'ESTTU'
+  // 'ESTTU' SPECIFIC FIELDS
   // ======================================================
 
-  /**
-   * O endereço residencial do usuário (rua, avenida, etc.).
-   * @optional Exclusivo para 'esttu'.
-   */
+  /** Residential address */
   endereco?: string;
 
-  /**
-   * O número do endereço residencial.
-   * @optional Exclusivo para 'esttu'.
-   */
+  /** Address number */
   numero?: string;
 
-  /**
-   * O complemento do endereço (apto, bloco, etc.).
-   * @optional Exclusivo para 'esttu'.
-   */
+  /** Address complement (apartment, block, etc.) */
   complemento?: string | null;
 
-  /**
-   * O CEP (Código de Endereçamento Postal).
-   * @optional Exclusivo para 'esttu'.
-   */
+  /** Postal code (CEP) */
   cep?: string;
 
-  /**
-   * A cidade de residência.
-   * @optional Exclusivo para 'esttu'.
-   */
+  /** City */
   cidade?: string;
 
-  /**
-   * O estado (UF) de residência.
-   * @optional Exclusivo para 'esttu'.
-   */
+  /** State (UF) */
   estado?: string;
 
-  /**
-   * O curso no qual o estudante está matriculado.
-   * @optional Exclusivo para 'esttu'.
-   */
+  /** Student course */
   curso?: string;
 
-  /**
-   * O nível de escolaridade do estudante.
-   * @optional Exclusivo para 'esttu'.
-   */
+  /** Student education level */
   escolaridade?: string;
 
-  /**
-   * A instituição de ensino do estudante.
-   * @optional Exclusivo para 'esttu'.
-   */
+  /** Educational institution */
   instituicao?: string;
 
-  /**
-   * O ano previsto para a renovação da carteirinha de estudante.
-   * @optional Exclusivo para 'esttu'.
-   */
+  /** Year for card renewal */
   anoParaRenovacao?: string;
 
-  /**
-   * A URL para o documento de matrícula do estudante.
-   * @optional Exclusivo para 'esttu'.
-   */
+  /** URL for enrollment document */
   documentMatricula?: string | null;
 
-  /**
-   * A URL para um documento de identificação com foto (RG, CNH).
-   * @optional Exclusivo para 'esttu'.
-   */
+  /** URL for ID document with photo */
   documentoComFoto?: string | null;
 
   // ======================================================
-  // CAMPOS ESPECÍFICOS DA APLICAÇÃO 'GITTU'
+  // 'GITTU' SPECIFIC FIELDS
   // ======================================================
 
-  /**
-   * O código CID (Classificação Internacional de Doenças) ou diagnóstico.
-   * @optional Exclusivo para 'gittu'.
-   */
+  /** CID code (diagnosis) */
   cid?: string;
 
-  /**
-   * A classe ou turma do usuário na instituição.
-   * @optional Exclusivo para 'gittu'.
-   */
+  /** Class or group */
   classe?: string;
 
-  /**
-   * A URL para o laudo ou documento de diagnóstico.
-   * @optional Exclusivo para 'gittu'.
-   */
+  /** URL for diagnostic document */
   documentDiagnostico?: string;
 
-  /**
-   * O nome completo da mãe do usuário.
-   * @optional Exclusivo para 'gittu'.
-   */
+  /** Mother's full name */
   nomeMae?: string;
 
-  /**
-   * O nome completo do pai do usuário.
-   * @optional Exclusivo para 'gittu'.
-   */
+  /** Father's full name */
   nomePai?: string;
 
-  /**
-   * O tipo sanguíneo do usuário (ex: "A+", "O-").
-   * @optional Exclusivo para 'gittu'.
-   */
+  /** Blood type (e.g., "A+", "O-") */
   tipoSanguineo?: string;
 }
 
-/** Payload para criar um novo usuário no repositório. */
+/** Payload for creating a new user (excluding IDs and 'cid') */
 export type UserCreatePayload = Omit<User, "cid" | "id" | "idDocument">;
 
-/** Payload para atualizar um usuário existente. */
+/** Payload for updating an existing user */
 export type UserUpdatePayload = Partial<UserCreatePayload>;

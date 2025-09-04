@@ -10,7 +10,6 @@ interface DataTableColumnHeaderProps<TData, TValue>
   title: string;
 }
 
-// Mapa de ícones baseado no estado de ordenação
 const sortIcons: Record<"asc" | "desc" | "none", React.ReactNode> = {
   asc: <SortAsc className="ml-2 h-4 w-4" />,
   desc: <SortDesc className="ml-2 h-4 w-4" />,
@@ -26,7 +25,6 @@ export function DataTableColumnHeader<TData, TValue>({
     return <div className={cn(className)}>{title}</div>;
   }
 
-  // pega o ícone com base no estado
   const sort = column.getIsSorted() || "none";
 
   return (

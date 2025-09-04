@@ -90,7 +90,6 @@ export async function POST(request: NextRequest) {
 
     const tokenService = new TokenService();
 
-    // 1. Verifica se o refresh token é válido e não expirou
     const session = await tokenService.verifyToken(refresh_token);
     if (!session) {
       return NextResponse.json(
@@ -99,10 +98,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 2. Gera novos tokens a partir do payload da sessão
     const tokens = await tokenService.generateTokens(session);
 
-    // 3. Retorna os novos tokens para o cliente
     return NextResponse.json(tokens);
   } catch (error) {
     console.error("Erro ao renovar token:", error);

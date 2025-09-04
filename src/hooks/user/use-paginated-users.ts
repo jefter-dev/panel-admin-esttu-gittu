@@ -105,8 +105,6 @@ export function usePaginatedUsers() {
   }, [page, pageSize, currentSearch, filterPayment, filterType, filterValue]); // não precisa do pageCursorsRef nas deps
 
   const handleFilterChange = useCallback((filters: Filters) => {
-    console.log("handleFilterChange: ", filters);
-
     setPage(1);
     setCurrentSearch(filters.search ?? "");
     setFilterPayment(

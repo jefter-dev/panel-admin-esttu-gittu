@@ -1,55 +1,74 @@
-// src/schemas/admin.ts
+/**
+ * @file schemas/admin.ts
+ *
+ * @summary Zod schemas for Admin entity validation.
+ * Includes validation for creation (POST) and update (PATCH).
+ */
+
 import { Role } from "@/types/admin.type";
 import { APP_VALUES } from "@/types/app.type";
 import z from "zod";
 
 // ===================================================
-// Schema para CRIAÇÃO (POST)
-// Todos os campos são obrigatórios.
+// Schema for Admin CREATION (POST)
+// All fields are required.
 // ===================================================
 export const adminCreateSchema = z.object({
+  /** Admin full name (min 3 chars) */
   name: z
-    .string({ error: "O nome é obrigatório." })
-    .min(3, "O nome deve ter pelo menos 3 caracteres."),
-  email: z.email("Formato de e-mail inválido."),
+    .string({ error: "Name is required." })
+    .min(3, "Name must be at least 3 characters."),
+
+  /** Admin email */
+  email: z.email("Invalid email format."),
+
+  /** Admin password (min 6 chars) */
   password: z
-    .string({ error: "A senha é obrigatória." })
-    .min(6, "A senha deve ter pelo menos 6 caracteres."),
-  role: z.enum(Role, { error: "A função (role) é obrigatória." }),
+    .string({ error: "Password is required." })
+    .min(6, "Password must be at least 6 characters."),
+
+  /** Admin role */
+  role: z.enum(Role, { error: "Role is required." }),
+
+  /** Target application */
   app: z.enum(APP_VALUES),
 });
 
 // ===================================================
-// Schema para ATUALIZAÇÃO (PATCH)
-// Todos os campos são opcionais, mas se forem enviados, devem ser válidos.
-// Garante que o objeto não esteja vazio.
+// Schema for Admin UPDATE (PATCH)
+// All fields are optional but must be valid if provided.
+// Object cannot be empty.
 // ===================================================
 export const adminUpdateSchema = z
   .object({
-    name: z
-      .string()
-      .min(3, "O nome deve ter pelo menos 3 caracteres.")
-      .optional(),
-    email: z.email("Formato de e-mail inválido.").optional(),
-    // A senha é opcional. Se não for enviada, não será alterada.
+    /** Optional name update */
+    name: z.string().min(3, "Name must be at least 3 characters.").optional(),
+
+    /** Optional email update */
+    email: z.email("Invalid email format.").optional(),
+
+    /** Optional password update (min 6 chars if provided) */
     password: z
       .string()
       .optional()
       .refine((val) => !val || val.length >= 6, {
-        message: "A senha deve ter pelo menos 6 caracteres",
+        message: "Password must be at least 6 characters",
       }),
 
-    // O papel também é opcional.
-    role: z.enum(Role),
-    app: z.enum(APP_VALUES),
+    /** Optional role update */
+    role: z.enum(Role).optional(),
+
+    /** Optional app update */
+    app: z.enum(APP_VALUES).optional(),
   })
-  // O refine garante que o cliente não envie um corpo de requisição vazio: {}
+  // Ensure object is not empty
   .refine((data) => Object.keys(data).length > 0, {
-    message: "Pelo menos um campo deve ser fornecido para atualização.",
-    // `path` ajuda a indicar que o erro é sobre o objeto como um todo.
+    message: "At least one field must be provided for update.",
     path: ["body"],
   });
 
-// Você também pode ter um tipo inferido para cada um
+// ===================================================
+// Types inferred from schemas
+// ===================================================
 export type AdminCreateInput = z.infer<typeof adminCreateSchema>;
 export type AdminUpdateInput = z.infer<typeof adminUpdateSchema>;

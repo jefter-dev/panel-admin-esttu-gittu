@@ -62,7 +62,6 @@ export function useAdminForm({ adminId }: UseAdminFormProps) {
 
   // ✅ submit para create/update
   const onSubmit = async (values: AdminCreateInput | AdminUpdateInput) => {
-    console.log("VALUES [FORM ADMIN]: ", values);
     setIsSubmitting(true);
     try {
       if (adminId) {

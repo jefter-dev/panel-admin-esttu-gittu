@@ -7,7 +7,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 export function DashboardSkeleton() {
   return (
     <div className="container mx-auto min-h-svh p-6 flex flex-col gap-8">
-      {/* Grid de estatísticas */}
+      {/* Grid statics */}
       <div className="grid gap-6 md:grid-cols-4">
         {Array.from({ length: 4 }).map((_, index) => (
           <Card key={index} className="shadow-md rounded-2xl">

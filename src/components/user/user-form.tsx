@@ -70,7 +70,6 @@ export function UserForm({ userId }: UserFormProps) {
       </h1>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-          {/* Container principal agora renderiza os componentes de seção */}
           <div className="grid grid-cols-12 gap-8">
             <PersonalDataSection
               control={form.control}

@@ -14,18 +14,16 @@ export class PaymentRepository extends FirestoreBaseService {
   }
 
   /**
-   * Cria um novo registro de pagamento no Firestore.
-   * @param payload Os dados do pagamento a serem criados.
-   * @returns O objeto Payment completo, incluindo o novo UUID.
-   * @throws {DataPersistenceError} Se a operação de escrita falhar.
+   * @summary Creates a new payment record in Firestore.
+   * @param payload {PaymentCreatePayload} Payment data to be created.
+   * @returns {Promise<Payment>} Returns the complete Payment object including timestamps.
+   * @throws {DataPersistenceError} If the write operation fails.
    */
   async create(payload: PaymentCreatePayload): Promise<Payment> {
     try {
       const dataToSave: Payment = {
         ...payload,
-        // createdAt agora como Timestamp
         createdAt: Timestamp.now(),
-        // paymentDate deve ser convertido para Timestamp se vier como string
         paymentDate:
           typeof payload.paymentDate === "string"
             ? Timestamp.fromDate(new Date(payload.paymentDate))
@@ -37,15 +35,25 @@ export class PaymentRepository extends FirestoreBaseService {
       return dataToSave;
     } catch (error) {
       console.error(
-        "[PaymentRepository.create] Erro ao criar pagamento:",
+        "[PaymentRepository.create] Error creating payment:",
         error
       );
-      throw new DataPersistenceError(
-        "Falha ao salvar o registro de pagamento."
-      );
+      throw new DataPersistenceError("Failed to save the payment record.");
     }
   }
 
+  /**
+   * @summary Finds payments with optional filtering, search, and pagination.
+   * @param options {{
+   *   limit?: number;
+   *   startAfter?: string;
+   *   search?: string;
+   *   dateFrom: string;
+   *   dateTo: string;
+   *   app: APP;
+   * }} Filtering and pagination options.
+   * @returns {Promise<Payment[]>} Returns a list of Payment objects.
+   */
   async find(options: {
     limit?: number;
     startAfter?: string;
@@ -67,7 +75,6 @@ export class PaymentRepository extends FirestoreBaseService {
     let snapshots: FirebaseFirestore.QueryDocumentSnapshot[] = [];
 
     if (search && search.trim() !== "") {
-      // Busca parcial por nome ou CPF
       let queryByName = this.collection
         .where("app", "==", app)
         .where("paymentDate", ">=", from)
@@ -116,7 +123,6 @@ export class PaymentRepository extends FirestoreBaseService {
       snapshots = snapshot.docs;
     }
 
-    // Remove duplicados e adiciona idDocument no retorno
     const uniqueDocsMap = new Map(snapshots.map((doc) => [doc.id, doc]));
 
     return Array.from(uniqueDocsMap.values())
@@ -128,10 +134,10 @@ export class PaymentRepository extends FirestoreBaseService {
   }
 
   /**
-   * Lista todos os pagamentos de um usuário específico.
-   * @param userId O UUID do usuário.
-   * @returns Uma lista de objetos Payment.
-   * @throws {DataPersistenceError} Se a consulta falhar.
+   * @summary Lists all payments for a specific user.
+   * @param userId {string} User UUID.
+   * @returns {Promise<Payment[]>} Returns a list of Payment objects.
+   * @throws {DataPersistenceError} If the query fails.
    */
   async findByUserId(userId: string): Promise<Payment[]> {
     try {
@@ -142,13 +148,21 @@ export class PaymentRepository extends FirestoreBaseService {
       return snapshot.docs.map((doc) => this.mapDocTo<Payment>(doc));
     } catch (error) {
       console.error(
-        `[PaymentRepository.findByUserId] Erro ao buscar pagamentos para o usuário ${userId}:`,
+        `[PaymentRepository.findByUserId] Error fetching payments for user ${userId}:`,
         error
       );
-      throw new DataPersistenceError("Falha ao listar os pagamentos.");
+      throw new DataPersistenceError("Failed to list payments.");
     }
   }
 
+  /**
+   * @summary Calculates the total payment amount within a date range.
+   * @param app {APP} App identifier.
+   * @param dateFrom {string} Start date (ISO string).
+   * @param dateTo {string} End date (ISO string).
+   * @returns {Promise<number>} Returns the total payment amount.
+   * @throws {DataPersistenceError} If calculation fails.
+   */
   async getTotalAmountByDateRange(
     app: APP,
     dateFrom: string,
@@ -177,26 +191,28 @@ export class PaymentRepository extends FirestoreBaseService {
       }, 0);
     } catch (error) {
       console.error(
-        "[PaymentRepository.getTotalAmountByDateRange] Erro:",
+        "[PaymentRepository.getTotalAmountByDateRange] Error:",
         error
       );
       throw new DataPersistenceError(
-        "Falha ao calcular o total de pagamentos no intervalo."
+        "Failed to calculate total payments in date range."
       );
     }
   }
 
+  /**
+   * @summary Returns daily payment counts for the current month.
+   * @param app {APP} App identifier.
+   * @returns {Promise<{ date: string; total: number }[]>} Returns array with date and total payments.
+   * @throws {DataPersistenceError} If fetching fails.
+   */
   async getPaymentsCurrentMonth(
     app: APP
   ): Promise<{ date: string; total: number }[]> {
     try {
-      // Começo e fim do mês em UTC
       const { start, end } = getStartAndEndOfMonthUTC();
       const fromTimestamp = Timestamp.fromDate(start);
       const toTimestamp = Timestamp.fromDate(end);
-
-      console.log("startTimestamp: ", fromTimestamp.toDate());
-      console.log("endTimestamp: ", toTimestamp.toDate());
 
       const query = this.collection
         .where("app", "==", app)
@@ -204,28 +220,25 @@ export class PaymentRepository extends FirestoreBaseService {
         .where("paymentDate", "<=", toTimestamp)
         .orderBy("paymentDate", "desc");
 
-      // Busca os dados
       const snapshot = await query.get();
 
       if (snapshot.empty) return [];
 
-      // Agrupa por dia
       const paymentsByDay = new Map<string, number>();
       snapshot.docs.forEach((doc) => {
         const payment = this.mapDocTo<Payment>(doc);
 
         let dateObj: Date;
-
         if (payment.paymentDate instanceof Timestamp) {
           dateObj = payment.paymentDate.toDate();
         } else if (typeof payment.paymentDate === "string") {
           dateObj = new Date(payment.paymentDate);
         } else {
           console.warn(
-            "[PaymentRepository.getPaymentsCurrentMonth] paymentDate inesperado:",
+            "[PaymentRepository.getPaymentsCurrentMonth] Unexpected paymentDate:",
             payment.paymentDate
           );
-          return; // ignora se for inválido
+          return;
         }
 
         const dayKey = `${dateObj.getUTCFullYear()}-${(
@@ -240,21 +253,26 @@ export class PaymentRepository extends FirestoreBaseService {
         paymentsByDay.set(dayKey, (paymentsByDay.get(dayKey) || 0) + 1);
       });
 
-      // Transforma em array ordenado
       return Array.from(paymentsByDay.entries())
         .map(([date, total]) => ({ date, total }))
         .sort((a, b) => a.date.localeCompare(b.date));
     } catch (error) {
       console.error(
-        "[PaymentRepository.getPaymentsCurrentMonth] Erro ao buscar pagamentos do mês corrente:",
+        "[PaymentRepository.getPaymentsCurrentMonth] Error fetching current month payments:",
         error
       );
-      throw new DataPersistenceError(
-        "Falha ao buscar pagamentos do mês corrente."
-      );
+      throw new DataPersistenceError("Failed to fetch current month payments.");
     }
   }
 
+  /**
+   * @summary Returns daily payment counts within a date range.
+   * @param app {APP} App identifier.
+   * @param dateFrom {string} Start date (ISO string).
+   * @param dateTo {string} End date (ISO string).
+   * @returns {Promise<{ date: string; total: number }[]>} Returns array with date and total payments.
+   * @throws {DataPersistenceError} If fetching fails.
+   */
   async getPaymentsByDateRange(
     app: APP,
     dateFrom: string,
@@ -277,24 +295,20 @@ export class PaymentRepository extends FirestoreBaseService {
         .orderBy("paymentDate", "desc");
 
       const snapshot = await query.get();
-
       if (snapshot.empty) return [];
 
-      // Agrupa por dia (quantidade de pagamentos)
       const paymentsByDay = new Map<string, number>();
-
       snapshot.docs.forEach((doc) => {
         const payment = this.mapDocTo<Payment>(doc);
 
         let dateObj: Date;
-
         if (payment.paymentDate instanceof Timestamp) {
           dateObj = payment.paymentDate.toDate();
         } else if (typeof payment.paymentDate === "string") {
           dateObj = new Date(payment.paymentDate);
         } else {
           console.warn(
-            "[getPaymentsByDateRange] paymentDate inválido:",
+            "[PaymentRepository.getPaymentsByDateRange] Invalid paymentDate:",
             payment.paymentDate
           );
           return;
@@ -316,17 +330,16 @@ export class PaymentRepository extends FirestoreBaseService {
         .map(([date, total]) => ({ date, total }))
         .sort((a, b) => a.date.localeCompare(b.date));
     } catch (error) {
-      console.error("[PaymentRepository.getPaymentsByDateRange] Erro:", error);
-      throw new DataPersistenceError(
-        "Falha ao buscar pagamentos no intervalo."
-      );
+      console.error("[PaymentRepository.getPaymentsByDateRange] Error:", error);
+      throw new DataPersistenceError("Failed to fetch payments in date range.");
     }
   }
 
   /**
-   * Retorna a quantidade de pagamentos e o valor total (amount) realizados no dia atual.
-   * @param app O identificador da aplicação (multi-tenant).
-   * @returns Um objeto com { count, totalAmount }.
+   * @summary Returns today's payment summary (count and total amount).
+   * @param app {APP} App identifier.
+   * @returns {Promise<{ count: number; totalAmount: number }>} Returns count and total amount.
+   * @throws {DataPersistenceError} If calculation fails.
    */
   async getPaymentsSummaryToday(
     app: APP
@@ -363,17 +376,18 @@ export class PaymentRepository extends FirestoreBaseService {
       return { count, totalAmount };
     } catch (error) {
       console.error(
-        "[PaymentRepository.getPaymentsSummaryToday] Erro ao calcular pagamentos do dia:",
+        "[PaymentRepository.getPaymentsSummaryToday] Error calculating today's payments:",
         error
       );
-      throw new DataPersistenceError("Falha ao calcular pagamentos do dia.");
+      throw new DataPersistenceError("Failed to calculate today's payments.");
     }
   }
 
   /**
-   * Retorna a lista de pagamentos realizados no dia atual.
-   * @param app O identificador da aplicação (multi-tenant).
-   * @returns Array de objetos Payment.
+   * @summary Returns today's payments.
+   * @param app {APP} App identifier.
+   * @returns {Promise<Payment[]>} Returns an array of Payment objects.
+   * @throws {DataPersistenceError} If fetching fails.
    */
   async getPaymentsToday(app: APP): Promise<Payment[]> {
     try {
@@ -399,23 +413,23 @@ export class PaymentRepository extends FirestoreBaseService {
       return snapshot.docs.map((doc) => this.mapDocTo<Payment>(doc));
     } catch (error) {
       console.error(
-        "[PaymentRepository.getPaymentsToday] Erro ao buscar pagamentos do dia:",
+        "[PaymentRepository.getPaymentsToday] Error fetching today's payments:",
         error
       );
-      throw new DataPersistenceError("Falha ao buscar pagamentos do dia.");
+      throw new DataPersistenceError("Failed to fetch today's payments.");
     }
   }
 
   /**
-   * Retorna a quantidade de pagamentos e o valor total (amount) realizados no mês corrente.
-   * @param app O identificador da aplicação (multi-tenant).
-   * @returns Um objeto com { count, totalAmount }.
+   * @summary Returns current month's payment summary (count and total amount).
+   * @param app {APP} App identifier.
+   * @returns {Promise<{ count: number; totalAmount: number }>} Returns count and total amount.
+   * @throws {DataPersistenceError} If calculation fails.
    */
   async getPaymentsSummaryCurrentMonth(
     app: APP
   ): Promise<{ count: number; totalAmount: number }> {
     try {
-      // Começo e fim do mês em UTC
       const { start, end } = getStartAndEndOfMonthUTC();
       const fromTimestamp = Timestamp.fromDate(start);
       const toTimestamp = Timestamp.fromDate(end);
@@ -441,10 +455,12 @@ export class PaymentRepository extends FirestoreBaseService {
       return { count, totalAmount };
     } catch (error) {
       console.error(
-        "[PaymentRepository.getPaymentsSummaryCurrentMonth] Erro ao calcular pagamentos do mês:",
+        "[PaymentRepository.getPaymentsSummaryCurrentMonth] Error calculating current month's payments:",
         error
       );
-      throw new DataPersistenceError("Falha ao calcular pagamentos do mês.");
+      throw new DataPersistenceError(
+        "Failed to calculate current month's payments."
+      );
     }
   }
 }

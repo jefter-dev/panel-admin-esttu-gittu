@@ -39,7 +39,6 @@ export function LoginForm({
   }
 
   return (
-    // Container principal que define a largura máxima do formulário
     <div className={cn("w-full max-w-md", className)} {...props}>
       <Card>
         <CardHeader className="text-center">

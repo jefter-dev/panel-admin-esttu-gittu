@@ -21,7 +21,6 @@ export default function UserList() {
     isLoading,
   } = usePaginatedUsers();
 
-  // 🔹 Controla se é o primeiro carregamento
   const [initialLoading, setInitialLoading] = useState(true);
 
   useEffect(() => {

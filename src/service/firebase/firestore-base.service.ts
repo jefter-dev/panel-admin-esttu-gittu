@@ -1,16 +1,14 @@
 import { Timestamp } from "firebase-admin/firestore";
 
 /**
- * Base service class for Firestore operations.
- *
+ * @summary Base service class for Firestore operations.
  * Provides utility methods for cleaning Firestore data and mapping documents.
  */
 export abstract class FirestoreBaseService {
   /**
-   * Recursively converts Firestore-specific data types (e.g., Timestamp) to plain JavaScript types.
-   *
-   * @param data The data to clean.
-   * @returns The cleaned data with Firestore types converted (e.g., Timestamp to ISO string).
+   * @summary Recursively converts Firestore-specific types to plain JavaScript types.
+   * @param data {unknown} The data to clean.
+   * @returns {unknown} Cleaned data with Firestore types converted (e.g., Timestamp to ISO string).
    */
   protected cleanFirestoreData(data: unknown): unknown {
     if (data instanceof Timestamp) {
@@ -34,11 +32,10 @@ export abstract class FirestoreBaseService {
   }
 
   /**
-   * Maps a Firestore DocumentSnapshot to a typed object including the document ID.
-   *
+   * @summary Maps a Firestore DocumentSnapshot to a typed object including the document ID.
    * @template T The expected type of the document data.
-   * @param doc The Firestore DocumentSnapshot.
-   * @returns The document data as type T, extended with the `idDocument` property.
+   * @param doc {FirebaseFirestore.DocumentSnapshot} The Firestore document snapshot.
+   * @returns {T & { idDocument: string }} Document data as type T with `idDocument` property.
    */
   protected mapDocTo<T>(
     doc: FirebaseFirestore.DocumentSnapshot

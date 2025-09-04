@@ -1,6 +1,6 @@
 import * as React from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
-import { PaymentsTodayTable } from "../payment/payments-today-table";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { PaymentsTodayTable } from "@/components/payment/payments-today-table";
 
 export function TablePaymentsToday() {
   return (

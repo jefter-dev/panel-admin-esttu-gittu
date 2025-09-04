@@ -1,16 +1,17 @@
+import { NextRequest, NextResponse } from "next/server";
+
 /**
  * @swagger
  * /api/download-image:
  *   post:
- *     summary: Faz o download de uma imagem externa atuando como um proxy
+ *     summary: Download an external image acting as a proxy
  *     description: >
- *       Recebe a URL de uma imagem, faz o download no lado do servidor e a retorna diretamente.
- *       Isso é útil para contornar problemas de CORS ao tentar exibir imagens de domínios externos no frontend.
- *     tags:
- *       - Utilidades
+ *       Receives the URL of an image, downloads it server-side, and returns it directly.
+ *       Useful to bypass CORS issues when displaying images from external domains on the frontend.
+ *     tags: [Utilities]
  *     requestBody:
  *       required: true
- *       description: Objeto contendo a URL da imagem a ser baixada.
+ *       description: Object containing the URL of the image to download.
  *       content:
  *         application/json:
  *           schema:
@@ -21,31 +22,29 @@
  *               url:
  *                 type: string
  *                 format: uri
- *                 description: A URL completa e acessível da imagem.
+ *                 description: Full and accessible URL of the image.
  *                 example: "https://images.unsplash.com/photo-1579546929518-9e396f3cc809"
  *     responses:
- *       '200':
- *         description: Imagem baixada com sucesso. O corpo da resposta contém os dados binários da imagem.
+ *       200:
+ *         description: Image downloaded successfully. Response body contains the binary image data.
  *         headers:
- *           'Content-Type':
- *             description: O tipo MIME da imagem retornada (ex. image/jpeg, image/png).
+ *           Content-Type:
+ *             description: MIME type of the returned image (e.g., image/jpeg, image/png).
  *             schema:
  *               type: string
- *           'Content-Disposition':
- *             description: Sugere ao navegador que o arquivo deve ser baixado (attachment).
+ *           Content-Disposition:
+ *             description: Suggests the browser to download the file as an attachment.
  *             schema:
  *               type: string
- *               example: 'attachment; filename="imagem.jpg"'
+ *               example: 'attachment; filename="image.jpg"'
  *         content:
- *           # Usamos um tipo genérico para dados binários
- *           'application/octet-stream':
+ *           application/octet-stream:
  *             schema:
  *               type: string
  *               format: binary
- *               description: Os dados brutos da imagem.
- *
- *       '400':
- *         description: Requisição malformada. A URL não foi fornecida ou é inválida.
+ *               description: Raw binary image data.
+ *       400:
+ *         description: Bad request. URL was not provided or is invalid.
  *         content:
  *           application/json:
  *             schema:
@@ -53,10 +52,9 @@
  *               properties:
  *                 error:
  *                   type: string
- *                   example: "URL inválida"
- *
- *       '500':
- *         description: Erro no servidor. Ocorreu uma falha ao tentar baixar a imagem da URL externa ou um erro interno.
+ *                   example: "Invalid URL"
+ *       500:
+ *         description: Server error. Failed to download the image from the external URL or internal error occurred.
  *         content:
  *           application/json:
  *             schema:
@@ -64,24 +62,21 @@
  *               properties:
  *                 error:
  *                   type: string
- *                   example: "Erro ao baixar a imagem"
+ *                   example: "Error downloading the image"
  */
-
-import { NextRequest, NextResponse } from "next/server";
-
 export async function POST(req: NextRequest) {
   try {
     const { url } = await req.json();
 
     if (!url || typeof url !== "string") {
-      return NextResponse.json({ error: "URL inválida" }, { status: 400 });
+      return NextResponse.json({ error: "Invalid URL" }, { status: 400 });
     }
 
     const response = await fetch(url);
 
     if (!response.ok) {
       return NextResponse.json(
-        { error: "Erro ao baixar a imagem" },
+        { error: "Error downloading the image" },
         { status: 500 }
       );
     }
@@ -92,14 +87,14 @@ export async function POST(req: NextRequest) {
 
     const headers = new Headers();
     headers.set("Content-Type", contentType);
-    headers.set("Content-Disposition", `attachment; filename="imagem.jpg"`);
+    headers.set("Content-Disposition", `attachment; filename="image.jpg"`);
 
     return new NextResponse(buffer, {
       status: 200,
       headers,
     });
   } catch (err) {
-    console.error("Erro ao fazer proxy da imagem:", err);
-    return NextResponse.json({ error: "Erro interno" }, { status: 500 });
+    console.error("Error proxying image:", err);
+    return NextResponse.json({ error: "Internal error" }, { status: 500 });
   }
 }

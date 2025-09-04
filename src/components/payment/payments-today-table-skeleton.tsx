@@ -43,25 +43,25 @@ export function PaymentsTodayTableSkeleton({
               {columns.map((col, j) => (
                 <TableCell key={j}>
                   {j === 0 ? (
-                    // Cliente com espaço maior
+                    // Client (fullname)
                     <Skeleton className="h-4 w-40" />
                   ) : j === 1 ? (
                     // CPF
                     <Skeleton className="h-4 w-32" />
                   ) : j === 2 ? (
-                    // Descrição
+                    // Description
                     <Skeleton className="h-4 w-48" />
                   ) : j === 3 ? (
-                    // Valor
+                    // Value
                     <Skeleton className="h-4 w-24" />
                   ) : j === 4 ? (
-                    // Método
+                    // Method
                     <Skeleton className="h-4 w-20" />
                   ) : j === 5 ? (
                     // Status
                     <Skeleton className="h-4 w-20" />
                   ) : (
-                    // Data
+                    // Datetime
                     <Skeleton className="h-4 w-36" />
                   )}
                 </TableCell>

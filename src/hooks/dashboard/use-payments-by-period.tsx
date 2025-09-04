@@ -29,8 +29,6 @@ export function usePaymentsByPeriod(timeRange: "7d" | "30d" | "90d") {
           },
         });
 
-        console.log("PAYMENTS GRAPH: ", res.data.stats);
-
         setPayments(res.data.stats.payments || []);
       } catch (err) {
         console.error(err);

@@ -17,7 +17,7 @@ export function DataTableUsersSkeleton({
 }) {
   return (
     <div className="space-y-4">
-      {/* Skeleton para a Barra de Ferramentas (Filtros) */}
+      {/* Skeleton tools (Filters) */}
       <div className="flex items-center justify-between py-4">
         <div className="flex items-center gap-4">
           <Skeleton className="h-8 w-95" />
@@ -25,7 +25,7 @@ export function DataTableUsersSkeleton({
         </div>
       </div>
 
-      {/* Skeleton para a Tabela */}
+      {/* Skeleton table*/}
       <div className="rounded-md border">
         <Table>
           <TableHeader>
@@ -42,7 +42,7 @@ export function DataTableUsersSkeleton({
               <TableRow key={i}>
                 {Array.from({ length: columnCount }).map((_, j) => (
                   <TableCell key={j}>
-                    {/* Imita a célula de Avatar + Texto, que é a mais complexa */}
+                    {/* Avatar + Text */}
                     {j === 1 ? (
                       <div className="flex items-center space-x-3">
                         <Skeleton className="h-10 w-10 rounded-full" />
@@ -62,12 +62,12 @@ export function DataTableUsersSkeleton({
         </Table>
       </div>
 
-      {/* Skeleton para a Paginação */}
+      {/* Skeleton Pagination */}
       <div className="flex items-center justify-end gap-4 py-4">
-        {/* Indicador de página */}
+        {/* INdicator page */}
         <Skeleton className="h-4 w-20" />
 
-        {/* Botões anterior / próximo */}
+        {/* Buttons previous / next */}
         <Skeleton className="h-9 w-24" />
         <Skeleton className="h-9 w-24" />
       </div>

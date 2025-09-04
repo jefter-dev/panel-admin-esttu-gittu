@@ -32,7 +32,7 @@ export function PaymentsTableToolbar({
       });
     }, 350);
 
-    return () => clearTimeout(handler); // limpa timeout se digitar novamente
+    return () => clearTimeout(handler);
   }, [currentSearch, currentDateRange, onFilterChange]);
 
   const handleSearchClick = () => {
@@ -53,7 +53,7 @@ export function PaymentsTableToolbar({
 
   return (
     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 py-4">
-      {/* Pesquisa */}
+      {/* Search input */}
       <div className="flex flex-col sm:flex-row items-center gap-4">
         <Input
           placeholder="Pesquisar por nome ou CPF"
@@ -72,7 +72,7 @@ export function PaymentsTableToolbar({
       </div>
 
       <div className="flex flex-col sm:flex-row items-center gap-4">
-        {/* Filtro de período */}
+        {/* Filter period */}
         <DateRangePicker
           date={currentDateRange}
           onChange={(range) => setCurrentDateRange(range)}
