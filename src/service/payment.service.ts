@@ -22,7 +22,7 @@ export class PaymentService {
   async createPayment(payload: PaymentCreateInput): Promise<Payment> {
     const payloadForRepo: PaymentCreatePayload = {
       ...payload,
-      paymentDate: Timestamp.fromDate(new Date(payload.paymentDate)),
+      paymentDate: Timestamp.fromDate(payload.paymentDate),
     };
 
     return await this.paymentRepository.create(payloadForRepo);

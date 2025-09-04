@@ -29,7 +29,7 @@ export const PRIMARY_NAV_ITEMS: NavigationItem[] = [
   },
   {
     id: "settings",
-    label: "Settings",
+    label: "Configurações",
     href: "/settings",
     icon: Settings,
   },
@@ -40,29 +40,24 @@ export const PRIMARY_NAV_ITEMS: NavigationItem[] = [
  */
 export const SECONDARY_NAV_ITEMS: NavigationItem[] = [
   {
-    id: "students",
-    label: "Users",
+    id: "users",
+    label: "Usuários",
     href: "/users",
     icon: UserSquare,
   },
   {
     id: "payment",
-    label: "Payments",
+    label: "Pagamentos",
     href: "/payments",
     icon: Wallet,
   },
   {
     id: "profile",
-    label: "Profile",
+    label: "Perfil",
     href: "/profile",
     icon: UserCog,
   },
 ];
-
-/**
- * @summary Additional paths that require authentication but are not part of navigation menus.
- */
-export const ADDITIONAL_PROTECTED_PATHS = ["/company-registration"];
 
 /**
  * @summary Complete list of protected paths (all paths requiring authentication).
@@ -71,13 +66,7 @@ export const ADDITIONAL_PROTECTED_PATHS = ["/company-registration"];
 export const ALL_PROTECTED_PATHS: string[] = [
   ...PRIMARY_NAV_ITEMS.map((item) => item.href),
   ...SECONDARY_NAV_ITEMS.map((item) => item.href),
-  ...ADDITIONAL_PROTECTED_PATHS,
 ].filter((path) => path !== LOGIN_PAGE);
-
-/**
- * @summary Paths that should be hidden from navigation menus.
- */
-export const HIDDEN_PATHS = ["/conversations"];
 
 /**
  * @summary Paths where the secondary sidebar should be displayed.
