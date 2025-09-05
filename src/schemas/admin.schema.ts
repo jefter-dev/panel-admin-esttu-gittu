@@ -42,17 +42,20 @@ export const adminCreateSchema = z.object({
 export const adminUpdateSchema = z
   .object({
     /** Optional name update */
-    name: z.string().min(3, "Name must be at least 3 characters.").optional(),
+    name: z
+      .string()
+      .min(3, "O nome deve ter no mínimo 3 caracteres.")
+      .optional(),
 
     /** Optional email update */
-    email: z.email("Invalid email format.").optional(),
+    email: z.email("Formato de e-mail inválido.").optional(),
 
     /** Optional password update (min 6 chars if provided) */
     password: z
       .string()
       .optional()
       .refine((val) => !val || val.length >= 6, {
-        message: "Password must be at least 6 characters",
+        message: "A senha deve ter no mínimo 6 caracteres.",
       }),
 
     /** Optional role update */
@@ -63,7 +66,7 @@ export const adminUpdateSchema = z
   })
   // Ensure object is not empty
   .refine((data) => Object.keys(data).length > 0, {
-    message: "At least one field must be provided for update.",
+    message: "Pelo menos um campo deve ser informado para atualização.",
     path: ["body"],
   });
 

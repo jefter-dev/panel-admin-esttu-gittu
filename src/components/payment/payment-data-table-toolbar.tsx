@@ -3,25 +3,32 @@
 import * as React from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, SearchX } from "lucide-react";
+import { Download, Search, SearchX } from "lucide-react";
 import { DateRange } from "react-day-picker";
 import { DateRangePicker } from "@/components/date-range-picker";
+
+import { Payment } from "@/types/payment.type";
+import { useExportToExcel } from "@/hooks/use-export-to-excel";
+import { mapPaymentsForExcel } from "@/lib/export-excel-utils";
 
 interface PaymentsTableToolbarProps {
   search: string;
   dateRange?: DateRange;
+  payments: Payment[];
   onFilterChange: (filters: { search: string; dateRange?: DateRange }) => void;
 }
 
 export function PaymentsTableToolbar({
   search,
   dateRange,
+  payments,
   onFilterChange,
 }: PaymentsTableToolbarProps) {
   const [currentSearch, setCurrentSearch] = React.useState(search);
   const [currentDateRange, setCurrentDateRange] = React.useState<DateRange>(
     dateRange ?? { from: undefined, to: undefined }
   );
+  const { exportToExcel, isExporting } = useExportToExcel();
 
   // Debounce
   React.useEffect(() => {
@@ -72,6 +79,20 @@ export function PaymentsTableToolbar({
       </div>
 
       <div className="flex flex-col sm:flex-row items-center gap-4">
+        {/* Button export excel */}
+
+        <Button
+          variant="outline"
+          onClick={() =>
+            exportToExcel(mapPaymentsForExcel(payments), "pagamentos")
+          }
+          disabled={isExporting}
+          className="flex items-center gap-2 cursor-pointer"
+        >
+          <Download size={14} />
+          {isExporting ? "Exportando..." : "Exportar Excel"}
+        </Button>
+
         {/* Filter period */}
         <DateRangePicker
           date={currentDateRange}

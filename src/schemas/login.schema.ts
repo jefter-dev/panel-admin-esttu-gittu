@@ -13,10 +13,10 @@ import { z } from "zod";
 // ===================================================
 export const loginSchema = z.object({
   /** User email (must be a valid email format) */
-  email: z.email("Invalid email format."),
+  email: z.email("Formato de e-mail inválido."),
 
   /** User password (min 6 characters) */
-  password: z.string().min(6, "Password must be at least 6 characters."),
+  password: z.string().min(6, "A senha deve ter no mínimo 6 caracteres."),
 });
 
 // ===================================================

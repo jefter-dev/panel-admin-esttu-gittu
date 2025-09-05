@@ -8,6 +8,7 @@ type StatCardProps = {
   value: number | string;
   color?: string;
   prefix?: string;
+  onClick?: () => void;
 };
 
 export function StatCard({
@@ -15,13 +16,15 @@ export function StatCard({
   value,
   color = "text-primary",
   prefix,
+  onClick,
 }: StatCardProps) {
   return (
     <motion.div
       whileHover={{ scale: 1.03 }}
       whileTap={{ scale: 0.98 }}
       transition={{ type: "spring", stiffness: 200, damping: 15 }}
-      className="w-full"
+      onClick={onClick}
+      className={`w-full ${onClick ? "cursor-pointer" : ""}`}
     >
       <Card className="shadow-md rounded-2xl">
         <CardHeader>

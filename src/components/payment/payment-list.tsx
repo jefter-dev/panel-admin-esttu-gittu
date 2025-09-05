@@ -6,6 +6,7 @@ import { PaymentsDataTable } from "@/components/payment/payment-data-table";
 import { PaymentsDataTableSkeleton } from "@/components/payment/payment-data-table-skeleton";
 import { subDays } from "date-fns";
 import { DateRange } from "react-day-picker";
+import { useSearchParams } from "next/navigation";
 
 export default function PaymentList() {
   const {
@@ -21,7 +22,32 @@ export default function PaymentList() {
     isLoading,
   } = usePaginatedPayments();
 
+  const searchParams = useSearchParams();
+
   const [initialLoading, setInitialLoading] = useState(true);
+
+  useEffect(() => {
+    const dateFrom = searchParams.get("dateFrom");
+    const dateTo = searchParams.get("dateTo");
+
+    if (dateFrom || dateTo) {
+      handleFilterChange({
+        search: "",
+        dateRange: {
+          from: dateFrom ? new Date(dateFrom) : subDays(new Date(), 7),
+          to: dateTo ? new Date(dateTo) : new Date(),
+        },
+      });
+    } else {
+      handleFilterChange({
+        search: "",
+        dateRange: {
+          from: subDays(new Date(), 7),
+          to: new Date(),
+        },
+      });
+    }
+  }, [searchParams, handleFilterChange]);
 
   useEffect(() => {
     if (!isLoading) {

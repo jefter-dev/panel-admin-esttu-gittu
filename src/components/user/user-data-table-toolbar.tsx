@@ -10,13 +10,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Search, SearchX } from "lucide-react";
+import { Download, Search, SearchX } from "lucide-react";
 import {
   ALLOWED_FILTER_TYPES,
   FilterPayment,
   FilterType,
   FilterValue,
 } from "@/types/filters-user.type";
+import { useExportToExcel } from "@/hooks/use-export-to-excel";
+import { User } from "@/types/user.type";
+import { mapUsersForExcel } from "@/lib/export-excel-utils";
 
 interface DataTableToolbarProps<TData> {
   table: TanstackTable<TData>;
@@ -28,18 +31,22 @@ interface DataTableToolbarProps<TData> {
     filterType?: FilterType;
     filterValue?: FilterValue;
   }) => void;
+  users: User[];
 }
 
-export function DataTableToolbar<TData>({
+export function UsersTableToolbar<TData>({
   search,
   filterPagamento,
   onFilterChange,
+  users,
 }: DataTableToolbarProps<TData>) {
   const [currentSearch, setCurrentSearch] = React.useState(search);
   const [filterType, setFilterType] = React.useState<FilterType | undefined>(
     undefined
   );
   const [filterValue, setFilterValue] = React.useState("");
+
+  const { exportToExcel, isExporting } = useExportToExcel();
 
   React.useEffect(() => {
     const handler = setTimeout(() => {
@@ -106,6 +113,16 @@ export function DataTableToolbar<TData>({
       </div>
 
       <div className="flex flex-col lg:flex-row items-center gap-4">
+        {/* Button export excel */}
+        <Button
+          variant="outline"
+          onClick={() => exportToExcel(mapUsersForExcel(users), "usuarios")}
+          disabled={isExporting}
+          className="flex items-center gap-2 cursor-pointer"
+        >
+          <Download size={14} />
+          {isExporting ? "Exportando..." : "Exportar Excel"}
+        </Button>
         <div className="flex flex-col sm:flex-row w-full lg:w-auto items-center gap-4">
           <Select
             value={filterType ?? ""}

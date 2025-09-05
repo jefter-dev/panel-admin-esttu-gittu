@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { addDays, format } from "date-fns";
+import { ptBR } from "date-fns/locale";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { DateRange } from "react-day-picker";
 
@@ -41,7 +42,7 @@ export function DateRangePicker({ date, onChange }: DateRangePickerProps) {
   return (
     <div className={cn("grid gap-2")}>
       <Popover>
-        <PopoverTrigger asChild>
+        <PopoverTrigger asChild className="cursor-pointer">
           <Button
             variant="outline"
             className={cn(
@@ -53,11 +54,11 @@ export function DateRangePicker({ date, onChange }: DateRangePickerProps) {
             {internalDate?.from ? (
               internalDate.to ? (
                 <>
-                  {format(internalDate.from, "dd/MM/yyyy")} -{" "}
-                  {format(internalDate.to, "dd/MM/yyyy")}
+                  {format(internalDate.from, "dd/MM/yyyy", { locale: ptBR })} -{" "}
+                  {format(internalDate.to, "dd/MM/yyyy", { locale: ptBR })}
                 </>
               ) : (
-                format(internalDate.from, "dd/MM/yyyy")
+                format(internalDate.from, "dd/MM/yyyy", { locale: ptBR })
               )
             ) : (
               <span>Escolha uma data</span>
@@ -71,6 +72,7 @@ export function DateRangePicker({ date, onChange }: DateRangePickerProps) {
             selected={internalDate}
             onSelect={handleChange}
             numberOfMonths={2}
+            locale={ptBR}
           />
         </PopoverContent>
       </Popover>

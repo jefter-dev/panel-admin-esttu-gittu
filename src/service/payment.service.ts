@@ -134,4 +134,13 @@ export class PaymentService {
   ): Promise<{ date: string; total: number }[]> {
     return this.paymentRepository.getPaymentsByDateRange(app, dateFrom, dateTo);
   }
+
+  /**
+   * @summary Counts total payments in the collection.
+   * @returns {Promise<number>} Returns the total number of payments.
+   * @throws {DataPersistenceError} If the count operation fails.
+   */
+  async countTotalPayments(): Promise<number> {
+    return this.paymentRepository.countTotalPayments();
+  }
 }

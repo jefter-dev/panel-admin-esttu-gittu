@@ -14,7 +14,10 @@ import { pagesMiddleware } from "@/middleware.pages";
  * Excludes API routes, static assets, and certain files from being processed.
  */
 export const config = {
-  matcher: "/((?!api|_next/static|_next/image|favicon.ico|cypress|.*\\..*).*)",
+  matcher: [
+    "/((?!_next/static|_next/image|favicon.ico|.*\\..*).*)",
+    "/api/:path*",
+  ],
 };
 
 /**

@@ -9,13 +9,7 @@ export const LOGIN_PAGE = "/";
 export const DASHBOARD_PAGE = "/dashboard";
 
 import { NavigationItem } from "@/types/navigation.type";
-import {
-  Settings,
-  LayoutPanelLeft,
-  Wallet,
-  UserSquare,
-  UserCog,
-} from "lucide-react";
+import { Settings, LayoutPanelLeft, Wallet, UserSquare } from "lucide-react";
 
 /**
  * @summary Primary navigation items displayed in the main menu.
@@ -50,12 +44,6 @@ export const SECONDARY_NAV_ITEMS: NavigationItem[] = [
     label: "Pagamentos",
     href: "/payments",
     icon: Wallet,
-  },
-  {
-    id: "profile",
-    label: "Perfil",
-    href: "/profile",
-    icon: UserCog,
   },
 ];
 

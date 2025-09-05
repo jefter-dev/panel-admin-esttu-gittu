@@ -26,7 +26,7 @@ import {
   FilterType,
   FilterValue,
 } from "@/types/filters-user.type";
-import { DataTableToolbar } from "@/components/user/user-data-table-toolbar";
+import { UsersTableToolbar } from "@/components/user/user-data-table-toolbar";
 import { DataTablePagination } from "@/components/data-table-pagination";
 
 interface UserDataTableProps {
@@ -77,9 +77,10 @@ export function UserDataTable({
 
   return (
     <>
-      <DataTableToolbar
+      <UsersTableToolbar
         table={table}
         search={search}
+        users={users}
         filterPagamento={filterPagamento}
         onFilterChange={onFilterChange}
       />

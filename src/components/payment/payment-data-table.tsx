@@ -63,6 +63,7 @@ export function PaymentsDataTable({
       <PaymentsTableToolbar
         search={search}
         dateRange={dateRange}
+        payments={payments}
         onFilterChange={onFilterChange}
       />
       <div className="overflow-x-auto">

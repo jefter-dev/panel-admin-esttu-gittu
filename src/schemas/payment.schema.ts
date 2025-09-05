@@ -34,37 +34,41 @@ export type PaymentStatus = (typeof paymentStatuses)[number];
 // ===================================================
 export const paymentCreateSchema = z.object({
   /** Internal payment ID (UUID of the system) */
-  id: z.uuid({ message: "Payment ID must be a valid UUID." }),
+  id: z.uuid({ message: "O ID do pagamento deve ser um UUID válido." }),
 
   /** Application identifier */
-  app: z.enum(APP_VALUES, { message: "Application is required." }),
+  app: z.enum(APP_VALUES, { message: "A aplicação é obrigatória." }),
 
   /** Gateway payment ID (Asaas, Pagar.me, Stripe, etc.) */
-  gatewayPaymentId: z.string({ message: "Gateway ID is required." }),
+  gatewayPaymentId: z.string({ message: "O ID do gateway é obrigatório." }),
 
   /** Gateway event ID for webhook auditing */
   gatewayEventId: z.string().optional(),
 
   /** User ID (UUID) who owns the payment */
-  userId: z.string({ message: "User ID is required." }),
+  userId: z.string({ message: "O ID do usuário é obrigatório." }),
 
   /** Amount in BRL */
   amount: z
-    .number({ message: "Amount is required." })
-    .positive({ message: "Amount must be positive." }),
+    .number({ message: "O valor é obrigatório." })
+    .positive({ message: "O valor deve ser positivo." }),
 
   /** Payment method */
-  method: z.enum(paymentMethods, { message: "Payment method is required." }),
+  method: z.enum(paymentMethods, {
+    message: "O método de pagamento é obrigatório.",
+  }),
 
   /** Payment status */
-  status: z.enum(paymentStatuses, { message: "Payment status is required." }),
+  status: z.enum(paymentStatuses, {
+    message: "O status do pagamento é obrigatório.",
+  }),
 
   /** Payment date in ISO 8601 format */
   paymentDate: z
     .string()
     .pipe(z.coerce.date())
     .refine((date) => !isNaN(date.getTime()), {
-      message: "Payment date must be in ISO 8601 format.",
+      message: "A data do pagamento deve estar no formato ISO 8601.",
     }),
 
   /** Description (e.g., "Student ID Card Physical") */
@@ -74,10 +78,10 @@ export const paymentCreateSchema = z.object({
   metadata: z.record(z.string(), z.any()).optional(),
 
   /** Customer name */
-  customerName: z.string({ message: "Customer name is required." }),
+  customerName: z.string({ message: "O nome do cliente é obrigatório." }),
 
   /** Customer CPF */
-  customerCpf: z.string({ message: "Customer CPF is required." }),
+  customerCpf: z.string({ message: "O CPF do cliente é obrigatório." }),
 });
 
 // ===================================================

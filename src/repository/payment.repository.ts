@@ -201,6 +201,24 @@ export class PaymentRepository extends FirestoreBaseService {
   }
 
   /**
+   * @summary Counts total payments in the collection.
+   * @returns {Promise<number>} Returns the total number of payments.
+   * @throws {DataPersistenceError} If the count operation fails.
+   */
+  async countTotalPayments(): Promise<number> {
+    try {
+      const snapshot = await this.collection.count().get();
+      return snapshot.data().count || 0;
+    } catch (error) {
+      console.error(
+        "[PaymentRepository.countTotalPayments] Error counting payments:",
+        error
+      );
+      throw new DataPersistenceError("Failed to count payments.");
+    }
+  }
+
+  /**
    * @summary Returns daily payment counts for the current month.
    * @param app {APP} App identifier.
    * @returns {Promise<{ date: string; total: number }[]>} Returns array with date and total payments.

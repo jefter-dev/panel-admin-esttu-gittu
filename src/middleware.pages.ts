@@ -23,11 +23,7 @@ export async function pagesMiddleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // --- Redirect helpers ---
-
   const redirectToLogin = () => {
-    console.log(
-      `Middleware: Access denied for '${pathname}'. Redirecting to login.`
-    );
     const response = NextResponse.redirect(new URL(LOGIN_PAGE, request.url));
     response.cookies.delete("auth_tokens");
     return response;
@@ -37,7 +33,6 @@ export async function pagesMiddleware(request: NextRequest) {
     NextResponse.redirect(new URL(DASHBOARD_PAGE, request.url));
 
   // --- Main logic ---
-
   const cookieToken = request.cookies.get("auth_tokens")?.value;
 
   // 1. User is not authenticated

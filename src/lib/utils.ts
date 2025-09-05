@@ -238,3 +238,42 @@ export const fetchImageProxy = async (url: string): Promise<string | null> => {
     return null;
   }
 };
+
+// utils/date.ts
+export interface DateRangeDefault {
+  from: Date;
+  to: Date;
+}
+
+/**
+ * Retorna um intervalo de datas padrão.
+ * @param days {number} Número de dias anteriores até hoje (incluso hoje)
+ * @returns {DateRangeDefault} Objeto com `from` e `to`
+ */
+export function getDefaultDateRange(days: number = 7): DateRangeDefault {
+  const now = new Date();
+
+  const to = new Date(now);
+  to.setHours(23, 59, 59, 999);
+
+  const from = new Date(now);
+  from.setDate(from.getDate() - (days - 1));
+  from.setHours(0, 0, 0, 0);
+
+  return { from, to };
+}
+
+/**
+ * Tenta parsear uma string para Date, caso inválida retorna o default fornecido
+ * @param dateStr {string | null}
+ * @param defaultDate {Date}
+ * @returns {Date}
+ */
+export function parseDateOrDefault(
+  dateStr: string | null,
+  defaultDate: Date
+): Date {
+  if (!dateStr) return defaultDate;
+  const date = new Date(dateStr);
+  return isNaN(date.getTime()) ? defaultDate : date;
+}
