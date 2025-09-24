@@ -7,7 +7,7 @@ import { motion } from "framer-motion";
 export function Footer() {
   return (
     <footer className="w-full border-t bg-background">
-      <div className="container mx-auto flex flex-col md:flex-row items-center justify-between gap-4 py-6">
+      <div className="container mx-auto flex flex-col md:flex-row items-center justify-between gap-4 py-6 px-10">
         <div className="flex items-center gap-2">
           <span className="text-sm font-medium text-muted-foreground">
             © {new Date().getFullYear()} Esttu | Gittu — Desenvolvido por
@@ -40,7 +40,7 @@ export function Footer() {
 
         <nav className="flex gap-6 text-sm text-muted-foreground">
           <Link href="/" className="hover:text-primary transition-colors">
-            Dashbooard
+            Dashboard
           </Link>
           <Link href="/users" className="hover:text-primary transition-colors">
             Usuários

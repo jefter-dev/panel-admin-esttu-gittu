@@ -56,7 +56,7 @@ export interface Payment {
   status: PaymentStatus;
 
   /** Date/time when payment was confirmed by the gateway (ISO 8601) */
-  paymentDate: Timestamp | string;
+  paymentDate: Timestamp | string | Date;
 
   /** Timestamp when the record was created */
   createdAt?: Timestamp;

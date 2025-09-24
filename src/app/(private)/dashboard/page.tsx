@@ -10,6 +10,7 @@ import { DashboardSkeleton } from "@/components/dashboard/dashboard-skeleton";
 import * as React from "react";
 import { TablePaymentsToday } from "@/components/dashboard/table-payments-today";
 import { useDashboardRedirect } from "@/hooks/dashboard/use-dashboard-redirect";
+import { useSession } from "@/context/session-context";
 
 export default function DashboardPage() {
   const { stats: userStats, isLoading: isLoadingUsers } = useUserStats();
@@ -21,6 +22,8 @@ export default function DashboardPage() {
     goToTodayPayments,
     goToMonthPayments,
   } = useDashboardRedirect();
+  const { user } = useSession();
+  const userRole = (user?.role) ?? "user";
 
   const [initialLoading, setInitialLoading] = React.useState(true);
 
@@ -45,14 +48,14 @@ export default function DashboardPage() {
         <StatCard
           title="Pagamentos confirmados"
           value={userStats?.paymentsConfirmed ?? "-"}
-          onClick={goToAllPayments}
+          onClick={userRole === "admin" ? goToAllPayments : undefined}
         />
         <StatCard
           title="Pagamentos | Hoje"
           value={`${todayStats.count} (${formatCurrency(
             todayStats.totalAmount
           )})`}
-          onClick={goToTodayPayments}
+          onClick={userRole === "admin" ? goToTodayPayments : undefined}
           color="text-green-600"
         />
         <StatCard
@@ -60,7 +63,7 @@ export default function DashboardPage() {
           value={`${monthStats.count} (${formatCurrency(
             monthStats.totalAmount
           )})`}
-          onClick={goToMonthPayments}
+          onClick={userRole === "admin" ? goToMonthPayments : undefined}
           color="text-green-600"
         />
       </div>

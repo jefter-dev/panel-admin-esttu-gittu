@@ -44,7 +44,7 @@ export function ChartInteractivePayments() {
           Total registrado no período selecionado
         </CardDescription>
 
-        <CardAction className="flex gap-2 items-center justify-center w-full">
+        <CardAction className="flex flex-col sm:flex-row gap-2 items-stretch sm:items-center w-full sm:justify-end">
           <DateTimeRangeSelector
             timeRange={timeRange}
             setTimeRange={setTimeRange}

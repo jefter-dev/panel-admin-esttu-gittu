@@ -22,29 +22,31 @@ export class PaymentRepository extends FirestoreBaseService {
    */
   async create(payload: PaymentCreatePayload): Promise<Payment> {
     try {
-      const timeZone = "America/Sao_Paulo";
+      let paymentDateTimestamp: Timestamp;
+      if (typeof payload.paymentDate === "string") {
+        const [datePart, timePart] = payload.paymentDate.split(" ");
+        const [year, month, day] = datePart.split("-").map(Number);
+        const [hours, minutes, seconds] = timePart.split(":").map(Number);
 
-      let date: Date;
-      if (payload.paymentDate instanceof Timestamp) {
-        date = payload.paymentDate.toDate();
-      } else if (typeof payload.paymentDate === "string") {
-        date = new Date(payload.paymentDate);
+        const paymentDateUtc = new Date(Date.UTC(year, month - 1, day, hours, minutes, seconds));
+        paymentDateTimestamp = Timestamp.fromDate(paymentDateUtc);
+      } else if (payload.paymentDate instanceof Timestamp) {
+        paymentDateTimestamp = payload.paymentDate;
       } else {
-        date = new Date();
+        throw new Error("Invalid paymentDate format");
       }
-
-      const paymentDate = Timestamp.fromDate(toZonedTime(date, timeZone));
 
       const dataToSave: Payment = {
         ...payload,
         createdAt: Timestamp.now(),
-        paymentDate,
+        paymentDate: paymentDateTimestamp,
       };
 
       await this.collection.doc(payload.id).set(dataToSave);
+
       return dataToSave;
     } catch (error) {
-      console.error("[PaymentRepository.create] Error:", error);
+      console.error("[PaymentRepository.create] Error creating payment:", error);
       throw new DataPersistenceError("Failed to save the payment record.");
     }
   }
