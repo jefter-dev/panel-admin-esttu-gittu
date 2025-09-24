@@ -28,6 +28,8 @@ export function UserDropdown() {
     ? "Carregando..."
     : user?.name || "Minha Conta";
 
+  const isAdmin = user?.role === "admin";
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -61,15 +63,17 @@ export function UserDropdown() {
           </DropdownMenuItem>
         </Link>
 
-        <Link href="/settings" passHref>
-          <DropdownMenuItem
-            className="cursor-pointer"
-            data-cy="user-dropdown-settings-item"
-          >
-            <Settings className="mr-2 h-4 w-4" />
-            Configurações
-          </DropdownMenuItem>
-        </Link>
+        {isAdmin && (
+          <Link href="/settings" passHref>
+            <DropdownMenuItem
+              className="cursor-pointer"
+              data-cy="user-dropdown-settings-item"
+            >
+              <Settings className="mr-2 h-4 w-4" />
+              Configurações
+            </DropdownMenuItem>
+          </Link>
+        )}
 
         <DropdownMenuSeparator />
 

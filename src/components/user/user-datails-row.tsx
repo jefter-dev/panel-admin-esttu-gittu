@@ -9,7 +9,7 @@ import {
   DialogFooter,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Download, QrCode } from "lucide-react";
+import { Download, QrCode, UserPen } from "lucide-react";
 import {
   downloadCanvasAsPng,
   getUrlQrCode,
@@ -17,6 +17,7 @@ import {
 } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { QrCodeValidateRegister } from "@/components/user/user-qrcode-validate-register";
+import Link from "next/link";
 
 function DetailItem({
   label,
@@ -42,7 +43,7 @@ function UserDocuments({ user }: { user: User }) {
   const canvasId = `qrcode-expanded-${user.idDocument}`;
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-2">
       <h4 className="font-bold text-foreground">Documentos</h4>
       {user.fotoIdentificacao && (
         <div className="flex flex-col items-start gap-2">
@@ -74,7 +75,7 @@ function UserDocuments({ user }: { user: User }) {
 
       <Dialog>
         <DialogTrigger asChild>
-          <Button variant="outline" className="cursor-pointer gap-2">
+          <Button variant="outline" size="sm" className="cursor-pointer gap-2">
             <QrCode size={14} /> QR Code
           </Button>
         </DialogTrigger>
@@ -84,6 +85,7 @@ function UserDocuments({ user }: { user: User }) {
           </div>
           <DialogFooter>
             <Button
+              size="sm"
               className="cursor-pointer gap-2"
               onClick={() =>
                 downloadCanvasAsPng(canvasId, `qrcode-${user.idDocument}`)
@@ -94,6 +96,15 @@ function UserDocuments({ user }: { user: User }) {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <div className="flex flex-col items-start gap-2">
+        <Link href={`/users/${user.id}`} passHref>
+          <Button size="sm" variant="outline" className="cursor-pointer gap-2">
+            <UserPen size={14} />
+            Editar Usuário
+          </Button>
+        </Link>
+      </div>
     </div>
   );
 }
@@ -141,8 +152,8 @@ function UserAddressAndFinance({ user }: { user: User }) {
         value={
           user.dataPagamento
             ? format(new Date(user.dataPagamento), "dd/MM/yyyy 'às' HH:mm", {
-                locale: ptBR,
-              })
+              locale: ptBR,
+            })
             : null
         }
       />

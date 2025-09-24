@@ -15,6 +15,7 @@ import { Menu } from "lucide-react";
 import { useLogout } from "@/hooks/auth/use-logout";
 import { useEffect, useState } from "react";
 import { SECONDARY_SIDEBAR_PATHS } from "@/lib/navigation";
+import { useSession } from "@/context/session-context";
 
 function SidebarContent({
   pathname,
@@ -25,6 +26,8 @@ function SidebarContent({
   readonly onLogout: () => void;
   readonly open?: boolean;
 }) {
+  const { user } = useSession();
+
   return (
     <div className="h-full flex w-[10px] shadow-md">
       <PrimarySidebar pathname={pathname} onLogout={onLogout} />

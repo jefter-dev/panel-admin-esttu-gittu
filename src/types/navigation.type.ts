@@ -41,4 +41,9 @@ export interface NavigationItem {
   label: string;
   /** URL path for the navigation item */
   href: string;
+   /**
+   * (Optional) Roles allowed to view this navigation item.
+   * If omitted, the item is public.
+   */
+  roles?: string[];
 }

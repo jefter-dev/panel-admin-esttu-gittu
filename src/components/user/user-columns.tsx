@@ -16,22 +16,11 @@ export const columns: ColumnDef<User>[] = [
     id: "expander",
     header: () => null,
     cell: ({ row }) => (
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={row.getToggleExpandedHandler()}
-        disabled={!row.getCanExpand()}
-        className="cursor-pointer h-8 w-8"
-      >
-        <ChevronRight
-          className={`h-4 w-4 transition-transform ${
-            row.getIsExpanded() ? "rotate-90" : ""
+      <ChevronRight
+        className={`h-4 w-4 transition-transform ${row.getIsExpanded() ? "rotate-90" : ""
           }`}
-        />
-        <span className="sr-only">Detalhes</span>
-      </Button>
+      />
     ),
-    // Disabled ordenation
     enableSorting: false,
     enableHiding: false,
   },

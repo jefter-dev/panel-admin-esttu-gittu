@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { PRIMARY_NAV_ITEMS } from "@/lib/navigation";
 import { useSession } from "@/context/session-context";
+import { NavigationItem } from "@/types/navigation.type";
 
 interface PrimarySidebarProps {
   readonly pathname: string;
@@ -13,6 +14,12 @@ interface PrimarySidebarProps {
 
 export function PrimarySidebar({ pathname, onLogout }: PrimarySidebarProps) {
   const { user, isLoading } = useSession();
+  const userRole = (user?.role) ?? "user";
+
+  const filteredNavItems = PRIMARY_NAV_ITEMS.filter(
+    (item: NavigationItem) =>
+      !item.roles || item.roles.includes(userRole)
+  );
 
   return (
     <aside
@@ -39,7 +46,7 @@ export function PrimarySidebar({ pathname, onLogout }: PrimarySidebarProps) {
         </Link>
 
         <nav className="flex flex-col space-y-3 px-3">
-          {PRIMARY_NAV_ITEMS.map((navItem) => {
+          {filteredNavItems.map((navItem) => {
             const Icon = navItem.icon;
             const isActive = pathname.startsWith(navItem.href);
 

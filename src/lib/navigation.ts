@@ -26,6 +26,7 @@ export const PRIMARY_NAV_ITEMS: NavigationItem[] = [
     label: "Configurações",
     href: "/settings",
     icon: Settings,
+    roles: ["admin"]
   },
 ];
 
@@ -44,6 +45,7 @@ export const SECONDARY_NAV_ITEMS: NavigationItem[] = [
     label: "Pagamentos",
     href: "/payments",
     icon: Wallet,
+    roles: ["admin"]
   },
 ];
 

@@ -3,6 +3,7 @@ import { Payment } from "@/types/payment.type";
 import { Badge } from "@/components/ui/badge";
 import { PaymentMethod, PaymentStatus } from "@/types/payment.type";
 import { UserDetailsDialog } from "@/components/user/user-datails-dialog";
+import { formatDateTime } from "@/lib/utils";
 
 export const columns: ColumnDef<Payment>[] = [
   {
@@ -64,6 +65,6 @@ export const columns: ColumnDef<Payment>[] = [
     accessorKey: "paymentDate",
     header: "Data do Pagamento",
     cell: ({ getValue }) =>
-      new Date(getValue<string>()).toLocaleString("pt-BR"),
+      formatDateTime(getValue<string>())
   },
 ];

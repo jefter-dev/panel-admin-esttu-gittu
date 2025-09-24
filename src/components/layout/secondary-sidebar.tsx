@@ -2,6 +2,8 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { NavigationItem } from "@/types/navigation.type";
 import { SECONDARY_NAV_ITEMS } from "@/lib/navigation";
+import { Role } from "@/types/admin.type";
+import { useSession } from "@/context/session-context";
 
 interface SecondarySidebarProps {
   readonly pathname: string;
@@ -10,9 +12,17 @@ interface SecondarySidebarProps {
 
 export function SecondarySidebar({
   pathname,
-  open = false,
+  open = false
 }: SecondarySidebarProps) {
   if (!open) return null;
+
+  const { user } = useSession();
+  const userRole = (user?.role) ?? "user";
+
+  const filteredNavItems = SECONDARY_NAV_ITEMS.filter(
+    (item: NavigationItem) =>
+      !item.roles || item.roles.includes(userRole)
+  );
 
   return (
     <aside
@@ -24,7 +34,7 @@ export function SecondarySidebar({
       data-cy="secondary-sidebar"
     >
       <nav>
-        {SECONDARY_NAV_ITEMS.map((item: NavigationItem) => {
+        {filteredNavItems.map((item: NavigationItem) => {
           const Icon = item.icon;
           const isActive = pathname.startsWith(item.href);
 

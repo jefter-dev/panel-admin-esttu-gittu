@@ -4,6 +4,7 @@ import { DataPersistenceError } from "@/errors/custom.errors";
 import { Payment, PaymentCreatePayload } from "@/types/payment.type";
 import { APP } from "@/types/app.type";
 import { getStartAndEndOfMonthUTC } from "@/lib/utils";
+import { toZonedTime } from "date-fns-tz";
 
 export class PaymentRepository extends FirestoreBaseService {
   private collection: FirebaseFirestore.CollectionReference;
@@ -21,23 +22,29 @@ export class PaymentRepository extends FirestoreBaseService {
    */
   async create(payload: PaymentCreatePayload): Promise<Payment> {
     try {
+      const timeZone = "America/Sao_Paulo";
+
+      let date: Date;
+      if (payload.paymentDate instanceof Timestamp) {
+        date = payload.paymentDate.toDate();
+      } else if (typeof payload.paymentDate === "string") {
+        date = new Date(payload.paymentDate);
+      } else {
+        date = new Date();
+      }
+
+      const paymentDate = Timestamp.fromDate(toZonedTime(date, timeZone));
+
       const dataToSave: Payment = {
         ...payload,
         createdAt: Timestamp.now(),
-        paymentDate:
-          typeof payload.paymentDate === "string"
-            ? Timestamp.fromDate(new Date(payload.paymentDate))
-            : payload.paymentDate,
+        paymentDate,
       };
 
       await this.collection.doc(payload.id).set(dataToSave);
-
       return dataToSave;
     } catch (error) {
-      console.error(
-        "[PaymentRepository.create] Error creating payment:",
-        error
-      );
+      console.error("[PaymentRepository.create] Error:", error);
       throw new DataPersistenceError("Failed to save the payment record.");
     }
   }
@@ -264,9 +271,9 @@ export class PaymentRepository extends FirestoreBaseService {
         )
           .toString()
           .padStart(2, "0")}-${dateObj
-          .getUTCDate()
-          .toString()
-          .padStart(2, "0")}`;
+            .getUTCDate()
+            .toString()
+            .padStart(2, "0")}`;
 
         paymentsByDay.set(dayKey, (paymentsByDay.get(dayKey) || 0) + 1);
       });
@@ -337,9 +344,9 @@ export class PaymentRepository extends FirestoreBaseService {
         )
           .toString()
           .padStart(2, "0")}-${dateObj
-          .getUTCDate()
-          .toString()
-          .padStart(2, "0")}`;
+            .getUTCDate()
+            .toString()
+            .padStart(2, "0")}`;
 
         paymentsByDay.set(dayKey, (paymentsByDay.get(dayKey) || 0) + 1);
       });

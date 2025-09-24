@@ -28,6 +28,7 @@ import {
 } from "@/types/filters-user.type";
 import { UsersTableToolbar } from "@/components/user/user-data-table-toolbar";
 import { DataTablePagination } from "@/components/data-table-pagination";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface UserDataTableProps {
   users: User[];
@@ -97,9 +98,9 @@ export function UserDataTable({
                           {header.isPlaceholder
                             ? null
                             : flexRender(
-                                header.column.columnDef.header,
-                                header.getContext()
-                              )}
+                              header.column.columnDef.header,
+                              header.getContext()
+                            )}
                         </TableHead>
                       );
                     })}
@@ -110,31 +111,42 @@ export function UserDataTable({
                 {table.getRowModel().rows?.length ? (
                   table.getRowModel().rows.map((row) => (
                     <React.Fragment key={row.id}>
-                      <TableRow data-state={row.getIsSelected() && "selected"}>
+                      <TableRow
+                        data-state={row.getIsSelected() && "selected"}
+                        className="cursor-pointer hover:bg-muted"
+                        onClick={(e) => {
+                          // evita disparar toggle ao clicar em botões ou links dentro da linha
+                          if ((e.target as HTMLElement).closest("[data-ignore-toggle]")) return;
+                          row.toggleExpanded();
+                        }}
+                      >
                         {row.getVisibleCells().map((cell) => (
                           <TableCell key={cell.id}>
-                            {flexRender(
-                              cell.column.columnDef.cell,
-                              cell.getContext()
-                            )}
+                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
                           </TableCell>
                         ))}
                       </TableRow>
-                      {row.getIsExpanded() && (
-                        <TableRow>
-                          <TableCell colSpan={columns.length}>
-                            <UserDetailsRow user={row.original} />
-                          </TableCell>
-                        </TableRow>
-                      )}
+
+                      <AnimatePresence initial={false}>
+                        {row.getIsExpanded() && (
+                          <motion.tr
+                            key="details"
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: "auto" }}
+                            exit={{ opacity: 0, height: 0 }}
+                            transition={{ duration: 0.2, ease: "easeInOut" }}
+                          >
+                            <TableCell colSpan={columns.length}>
+                              <UserDetailsRow user={row.original} />
+                            </TableCell>
+                          </motion.tr>
+                        )}
+                      </AnimatePresence>
                     </React.Fragment>
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell
-                      colSpan={columns.length}
-                      className="h-24 text-center"
-                    >
+                    <TableCell colSpan={columns.length} className="h-24 text-center">
                       Nenhum resultado encontrado.
                     </TableCell>
                   </TableRow>
