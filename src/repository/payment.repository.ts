@@ -4,7 +4,6 @@ import { DataPersistenceError } from "@/errors/custom.errors";
 import { Payment, PaymentCreatePayload } from "@/types/payment.type";
 import { APP } from "@/types/app.type";
 import { getStartAndEndOfMonthUTC } from "@/lib/utils";
-import { toZonedTime } from "date-fns-tz";
 
 export class PaymentRepository extends FirestoreBaseService {
   private collection: FirebaseFirestore.CollectionReference;
@@ -20,33 +19,31 @@ export class PaymentRepository extends FirestoreBaseService {
    * @returns {Promise<Payment>} Returns the complete Payment object including timestamps.
    * @throws {DataPersistenceError} If the write operation fails.
    */
+  /**
+   * @summary Creates a new payment record in Firestore.
+   * @param payload {PaymentCreatePayload} Payment data to be created.
+   * @returns {Promise<Payment>} Returns the complete Payment object including timestamps.
+   * @throws {DataPersistenceError} If the write operation fails.
+   */
   async create(payload: PaymentCreatePayload): Promise<Payment> {
     try {
-      let paymentDateTimestamp: Timestamp;
-      if (typeof payload.paymentDate === "string") {
-        const [datePart, timePart] = payload.paymentDate.split(" ");
-        const [year, month, day] = datePart.split("-").map(Number);
-        const [hours, minutes, seconds] = timePart.split(":").map(Number);
-
-        const paymentDateUtc = new Date(Date.UTC(year, month - 1, day, hours, minutes, seconds));
-        paymentDateTimestamp = Timestamp.fromDate(paymentDateUtc);
-      } else if (payload.paymentDate instanceof Timestamp) {
-        paymentDateTimestamp = payload.paymentDate;
-      } else {
-        throw new Error("Invalid paymentDate format");
-      }
-
       const dataToSave: Payment = {
         ...payload,
         createdAt: Timestamp.now(),
-        paymentDate: paymentDateTimestamp,
+        paymentDate:
+          typeof payload.paymentDate === "string"
+            ? Timestamp.fromDate(new Date(payload.paymentDate))
+            : payload.paymentDate,
       };
 
       await this.collection.doc(payload.id).set(dataToSave);
 
       return dataToSave;
     } catch (error) {
-      console.error("[PaymentRepository.create] Error creating payment:", error);
+      console.error(
+        "[PaymentRepository.create] Error creating payment:",
+        error
+      );
       throw new DataPersistenceError("Failed to save the payment record.");
     }
   }
