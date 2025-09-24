@@ -2,7 +2,6 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { NavigationItem } from "@/types/navigation.type";
 import { SECONDARY_NAV_ITEMS } from "@/lib/navigation";
-import { Role } from "@/types/admin.type";
 import { useSession } from "@/context/session-context";
 
 interface SecondarySidebarProps {
@@ -14,10 +13,10 @@ export function SecondarySidebar({
   pathname,
   open = false
 }: SecondarySidebarProps) {
-  if (!open) return null;
-
   const { user } = useSession();
   const userRole = (user?.role) ?? "user";
+
+  if (!open) return null;
 
   const filteredNavItems = SECONDARY_NAV_ITEMS.filter(
     (item: NavigationItem) =>

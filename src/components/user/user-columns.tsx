@@ -6,7 +6,6 @@ import { ChevronRight } from "lucide-react";
 import { User } from "@/types/user.type";
 
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { DataTableColumnHeader } from "@/components/data-table-column-header";
 import { UserDataTableActions } from "@/components/user/user-data-table-actions";
 import { UserCell } from "@/components/user/user-cell";
