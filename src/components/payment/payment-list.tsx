@@ -7,8 +7,20 @@ import { PaymentsDataTableSkeleton } from "@/components/payment/payment-data-tab
 import { subDays } from "date-fns";
 import { DateRange } from "react-day-picker";
 import { useSearchParams } from "next/navigation";
+import { useSession } from "@/context/session-context";
+import { useRouter } from "next/navigation";
 
 export default function PaymentList() {
+  const { user } = useSession();
+  const userRole = user?.role ?? "user";
+  const router = useRouter();
+
+  useEffect(() => {
+    if (userRole !== "admin") {
+      router.replace("/dashboard");
+    }
+  }, [userRole, router]);
+
   const {
     payments,
     page,

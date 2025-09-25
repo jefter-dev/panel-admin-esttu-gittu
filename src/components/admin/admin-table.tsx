@@ -15,9 +15,21 @@ import { formatDateTime } from "@/lib/utils";
 import { AdminTableActions } from "@/components/admin/admin-table-actions";
 import { Admin } from "@/types/admin.type";
 import { AdminTableToolbar } from "@/components/admin/admin-table-toolbar";
+import { useSession } from "@/context/session-context";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export function AdminTable() {
   const { admins, isLoading } = useAdmins();
+  const { user } = useSession();
+  const userRole = user?.role ?? "user";
+  const router = useRouter();
+
+  useEffect(() => {
+    if (userRole !== "admin") {
+      router.replace("/dashboard");
+    }
+  }, [userRole, router]);
 
   if (isLoading) return <TableSkeletonAdmin />;
 
