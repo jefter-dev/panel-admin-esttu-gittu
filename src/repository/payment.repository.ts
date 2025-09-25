@@ -27,23 +27,30 @@ export class PaymentRepository extends FirestoreBaseService {
    */
   async create(payload: PaymentCreatePayload): Promise<Payment> {
     try {
+      let paymentDate: Date;
+
+      if (typeof payload.paymentDate === "string") {
+        paymentDate = new Date(payload.paymentDate);
+      } else if (payload.paymentDate instanceof Timestamp) {
+        paymentDate = payload.paymentDate.toDate();
+      } else {
+        paymentDate = payload.paymentDate as Date;
+      }
+
+      // add +3h
+      paymentDate.setHours(paymentDate.getHours() + 3);
+
       const dataToSave: Payment = {
         ...payload,
         createdAt: Timestamp.now(),
-        paymentDate:
-          typeof payload.paymentDate === "string"
-            ? Timestamp.fromDate(new Date(payload.paymentDate))
-            : payload.paymentDate,
+        paymentDate: Timestamp.fromDate(paymentDate),
       };
 
       await this.collection.doc(payload.id).set(dataToSave);
 
       return dataToSave;
     } catch (error) {
-      console.error(
-        "[PaymentRepository.create] Error creating payment:",
-        error
-      );
+      console.error("[PaymentRepository.create] Error creating payment:", error);
       throw new DataPersistenceError("Failed to save the payment record.");
     }
   }
