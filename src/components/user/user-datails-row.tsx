@@ -98,7 +98,7 @@ function UserDocuments({ user }: { user: User }) {
       </Dialog>
 
       <div className="flex flex-col items-start gap-2">
-        <Link href={`/users/${user.id}`} passHref>
+        <Link href={`/users/${user.idDocument}`} passHref>
           <Button size="sm" variant="outline" className="cursor-pointer gap-2">
             <UserPen size={14} />
             Editar Usuário
