@@ -79,34 +79,27 @@ export async function handleDownloadImage(url: string, filename: string) {
 export function getUrlQrCode(user: User) {
   const isEsttu = !!user.curso;
 
-  const qrCodePayload = isEsttu
-    ? {
-        id: user.id,
-        nome: user.nome,
-        sobrenome: user.sobrenome,
-        cpf: user.cpf,
-        dataNascimento: user.dataNascimento,
-        curso: user.curso,
-        instituicao: user.instituicao,
-        anoParaRenovacao: user.anoParaRenovacao,
-      }
-    : {
-        id: user.id,
-        nome: user.nome,
-        sobrenome: user.sobrenome,
-        cpf: user.cpf,
-        dataNascimento: user.dataNascimento,
-        cid: user.cid,
-        classe: user.classe,
-        nomeMae: user.nomeMae,
-        nomePai: user.nomePai,
-        tipoSanguineo: user.tipoSanguineo,
-      };
+  if (isEsttu) {
+    const qrCodePayload = {
+      id: user.id,
+      nome: user.nome,
+      sobrenome: user.sobrenome,
+      cpf: user.cpf,
+      dataNascimento: user.dataNascimento,
+      curso: user.curso,
+      instituicao: user.instituicao,
+      anoParaRenovacao: user.anoParaRenovacao,
+      fotoIdentificacao: user.fotoIdentificacao,
+    };
 
-  const baseUrl = isEsttu ? "https://esttu-ec034.web.app/#/carteirinha" : "";
-  const userEncoded = encodeURIComponent(JSON.stringify(qrCodePayload));
-  return isEsttu ? `${baseUrl}?user=${userEncoded}` : user.documentDiagnostico;
+    const baseUrl = "https://esttu-ec034.web.app/#/carteirinha";
+    const userEncoded = encodeURIComponent(JSON.stringify(qrCodePayload));
+    return `${baseUrl}?user=${userEncoded}`;
+  }
+
+  return user.documentDiagnostico;
 }
+
 
 /**
  * Downloads a <canvas> element as a PNG image.

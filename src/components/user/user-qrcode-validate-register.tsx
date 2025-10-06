@@ -18,8 +18,8 @@ export function QrCodeValidateRegister({
       fgColor="#000000"
       quietZone={6}
       id={id}
-      ecLevel="H"
-      qrStyle="dots"
+      ecLevel="L"
+      qrStyle="squares"
     />
   );
 }
